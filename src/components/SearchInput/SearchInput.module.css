@@ -1,0 +1,28 @@
+.Container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: clamp(360px, 600px, 60%);
+    margin: 0 auto 3rem auto;
+    position: sticky;
+    top: 2rem;
+    z-index: 9999;
+}
+
+.Input {
+    width: 100%;
+    min-height: 48px;
+    font-size: 24px;
+    border-radius: 12px;
+    border: 2px solid rgba(var(--accentColor), 0.1);
+    padding: 0.4rem 0.8rem;
+    box-shadow: 0 0 12px -6px rgba(var(--accentColor), 0.6);
+
+    &:focus,
+    &:hover {
+        border: 2px solid rgba(var(--accentColor), 0.1);
+        outline: none;
+        box-shadow: 0 0 16px -4px rgba(var(--accentColor), 0.8);
+    }
+}
