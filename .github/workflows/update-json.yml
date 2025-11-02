@@ -5,6 +5,7 @@ on:
       - main # Triggers on pushes to the 'main' branch
   schedule:
     - cron: "0 0 * * *" # Triggers daily at midnight UTC
+  workflow_dispatch:
 
 jobs:
   build:
