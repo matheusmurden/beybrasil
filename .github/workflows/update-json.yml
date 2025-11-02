@@ -1,0 +1,37 @@
+name: CI
+on:
+  push:
+    branches:
+      - main # Triggers on pushes to the 'main' branch
+  schedule:
+    - cron: '0 0 * * *' # Triggers daily at midnight UTC
+
+jobs:
+  build:
+    name: Update JSON
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set Node.js 22.12.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.12.x
+
+      - name: Run install
+        uses: borales/actions-yarn@v5
+        with:
+          cmd: install # will run `yarn install` command
+      - name: Update JSON DB
+        uses: borales/actions-yarn@v5
+        env:
+          VITE_DOWNLOAD_URL: ${{ secrets.VITE_DOWNLOAD_URL }}
+        with:
+          cmd: updateJsonDb # will run `yarn updateJsonDb` command
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git add *.json
+          git commit -m 'Update JSON'
+          git push
