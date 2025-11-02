@@ -1,8 +1,10 @@
 import csvToJson from "csvtojson";
 import fs from "node:fs";
+import { config } from "dotenv";
 
-const downloadUrl =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRWzdoO9fD6_FQF2fvtFAxaGh5VKE2-PcvZVZ7oip1oA2Y1GgJAehwq5Iobxsv3Dh43cfT1sf-jVJGi/pub?output=csv";
+config();
+
+const downloadUrl = process.env.VITE_DOWNLOAD_URL;
 const csvFilePath = `${import.meta.dirname}/src/assets/data.csv`;
 const jsonFilePath = `${import.meta.dirname}/src/assets/data.json`;
 
@@ -43,7 +45,6 @@ await fetch(downloadUrl)
     })
       .fromFile(csvFilePath)
       .then((orgsJson) => {
-        console.log(orgsJson);
         fs.writeFileSync(jsonFilePath, JSON.stringify(orgsJson));
       });
   });

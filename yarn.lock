@@ -812,31 +812,6 @@ csstype@^3.0.2:
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.1.3.tgz#d80ff294d114fb0e6ac500fbf85b60137d7eff81"
   integrity sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==
 
-csv-generate@^4.5.0:
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/csv-generate/-/csv-generate-4.5.0.tgz#5fbbb89bd9f8ce705871c9baf02e1d4bb4000fb3"
-  integrity sha512-aQr/vmOKyBSBHNwYhAoXw1+kUsPnMSwmYgpNoo36rIXoG1ecWILnvPGZeQ6oUjzrWknZAD3+jfpqYOBAl4x15A==
-
-csv-parse@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-6.1.0.tgz#c642ec5b7fc57c1f477a07d179beb5ff0dfd5ed0"
-  integrity sha512-CEE+jwpgLn+MmtCpVcPtiCZpVtB6Z2OKPTr34pycYYoL7sxdOkXDdQ4lRiw6ioC0q6BLqhc6cKweCVvral8yhw==
-
-csv-stringify@^6.6.0:
-  version "6.6.0"
-  resolved "https://registry.yarnpkg.com/csv-stringify/-/csv-stringify-6.6.0.tgz#d384859cfb71d0a4a73c5bcc36a4daf5440cb033"
-  integrity sha512-YW32lKOmIBgbxtu3g5SaiqWNwa/9ISQt2EcgOq0+RAIFufFp9is6tqNnKahqE5kuKvrnYAzs28r+s6pXJR8Vcw==
-
-csv@^6.4.1:
-  version "6.4.1"
-  resolved "https://registry.yarnpkg.com/csv/-/csv-6.4.1.tgz#c9a62130c025f8adb2a85a75d4c2608612995822"
-  integrity sha512-ajGosmTGnTwYyGl8STqZDu7R6LkDf3xL39XiOmliV/GufQeVUxHzTKIm4NOBCwmEuujK7B6isxs4Uqt9GcRCvA==
-  dependencies:
-    csv-generate "^4.5.0"
-    csv-parse "^6.1.0"
-    csv-stringify "^6.6.0"
-    stream-transform "^3.4.0"
-
 csvtojson@^2.0.14:
   version "2.0.14"
   resolved "https://registry.yarnpkg.com/csvtojson/-/csvtojson-2.0.14.tgz#89b46c302bb1aae1f2f7a9d8a5a3d7a6c301750b"
@@ -860,6 +835,11 @@ detect-libc@^2.0.3:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-2.1.2.tgz#689c5dcdc1900ef5583a4cb9f6d7b473742074ad"
   integrity sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==
+
+dotenv@^17.2.3:
+  version "17.2.3"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-17.2.3.tgz#ad995d6997f639b11065f419a22fabf567cdb9a2"
+  integrity sha512-JVUnt+DUIzu87TABbhPmNfVdBDt18BLOWjMUFJMSi/Qqg7NTYtabbvSNJGOJ7afbRuv9D/lngizHtP7QyLQ+9w==
 
 electron-to-chromium@^1.5.238:
   version "1.5.244"
@@ -1553,11 +1533,6 @@ source-map-js@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.2.1.tgz#1ce5650fddd87abc099eda37dcff024c2667ae46"
   integrity sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==
-
-stream-transform@^3.4.0:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/stream-transform/-/stream-transform-3.4.0.tgz#38d562fbdad38c3b6cda959ad36751014bb26e18"
-  integrity sha512-QO3OGhKyeIV8p6eRQdG+W6WounFw519zk690hHCNfhgfP9bylVS+NTXsuBc7n+RsGn31UgFPGrWYIgoAbArKEw==
 
 string-ts@^2.2.1:
   version "2.2.1"
