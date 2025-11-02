@@ -3,6 +3,7 @@ import "./App.css";
 import jsonData from "./assets/data.json";
 import { OrgSection, SearchInput } from "./components";
 import { useMemo, useState } from "react";
+import { track } from "@vercel/analytics";
 
 const getRowArrValues = (arr: string[]) => {
   if (!arr.length) {
@@ -51,6 +52,12 @@ function App() {
                       target="_blank"
                       rel="noreferer"
                       href={(row.instagram as string[])?.[1]}
+                      onClick={() => {
+                        track("Org Instagram Click", {
+                          org: row.acronym,
+                          orgName: row.name,
+                        });
+                      }}
                     >
                       {(row.instagram as string[])?.[0] ?? ""}
                     </a>
@@ -74,6 +81,13 @@ function App() {
             target="_blank"
             rel="noreferer"
             href="https://instagram.com/matheusmurden"
+            onClick={() => {
+              track("click", {
+                text: "@matheusmurden",
+                location: "footer",
+                href: "https://instagram.com/matheusmurden",
+              });
+            }}
           >
             @matheusmurden
           </a>
@@ -85,6 +99,13 @@ function App() {
             target="_blank"
             rel="noreferer"
             href="https://instagram.com/wiivern"
+            onClick={() => {
+              track("click", {
+                text: "@wiivern",
+                location: "footer",
+                href: "https://instagram.com/wiivern",
+              });
+            }}
           >
             @wiivern
           </a>{" "}
@@ -93,6 +114,13 @@ function App() {
             target="_blank"
             rel="noreferer"
             href="https://instagram.com/imperadorbey"
+            onClick={() => {
+              track("click", {
+                text: "@imperadorbey",
+                location: "footer",
+                href: "https://instagram.com/imperadorbey",
+              });
+            }}
           >
             @imperadorbey
           </a>{" "}

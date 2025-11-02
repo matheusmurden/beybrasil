@@ -1,4 +1,5 @@
 import classes from "./SearchInput.module.css";
+import { track } from "@vercel/analytics";
 
 export const SearchInput = ({
   value,
@@ -13,6 +14,11 @@ export const SearchInput = ({
         value={value}
         onChange={(e) => {
           onChange?.(e.target.value);
+        }}
+        onBlur={() => {
+          track("searched", {
+            query: value ?? "",
+          });
         }}
         className={classes.Input}
         id="searchInput"
