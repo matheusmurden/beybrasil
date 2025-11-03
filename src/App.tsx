@@ -44,14 +44,14 @@ function App() {
                 <h2>{row.name}</h2>
               </div>
               <div>
-                <p>Estado(s): {getRowArrValues(row.states as string[])}</p>
-                <p>Cidade(s): {getRowArrValues(row.cities as string[])}</p>
-                {!!(row.instagram as string[])?.[1] && (
+                <p>Estado(s): {getRowArrValues(row.states)}</p>
+                <p>Cidade(s): {getRowArrValues(row.cities)}</p>
+                {!!row.instagram?.[1] && (
                   <p>
                     <a
                       target="_blank"
                       rel="noreferer"
-                      href={(row.instagram as string[])?.[1]}
+                      href={row.instagram?.[1]}
                       onClick={() => {
                         track("Org Instagram Click", {
                           org: row.acronym,
@@ -59,7 +59,7 @@ function App() {
                         });
                       }}
                     >
-                      {(row.instagram as string[])?.[0] ?? ""}
+                      {row.instagram?.[0] ?? ""}
                     </a>
                   </p>
                 )}
