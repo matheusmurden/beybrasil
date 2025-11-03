@@ -5,18 +5,6 @@ import { OrgSection, SearchInput } from "./components";
 import { useMemo, useState } from "react";
 import { track } from "@vercel/analytics";
 
-const getRowArrValues = (arr: string[]) => {
-  if (!arr.length) {
-    return null;
-  }
-  return arr.map((i, index) => (
-    <span key={i}>
-      {i}
-      {index !== arr.length - 1 && ", "}
-    </span>
-  ));
-};
-
 function App() {
   const [searchQuery, setSearchQuery] = useState<string>();
   const filteredData = useMemo(() => {
@@ -38,33 +26,7 @@ function App() {
       {filteredData.length > 0 ? (
         <main>
           {filteredData?.map((row) => (
-            <OrgSection key={`row-${row?.acronym}`}>
-              <div>
-                <h1>{row.acronym}</h1>
-                <h2>{row.name}</h2>
-              </div>
-              <div>
-                <p>Estado(s): {getRowArrValues(row.states)}</p>
-                <p>Cidade(s): {getRowArrValues(row.cities)}</p>
-                {!!row.instagram?.[1] && (
-                  <p>
-                    <a
-                      target="_blank"
-                      rel="noreferer"
-                      href={row.instagram?.[1]}
-                      onClick={() => {
-                        track("Org Instagram Click", {
-                          org: row.acronym,
-                          orgName: row.name,
-                        });
-                      }}
-                    >
-                      {row.instagram?.[0] ?? ""}
-                    </a>
-                  </p>
-                )}
-              </div>
-            </OrgSection>
+            <OrgSection key={`row-${row?.acronym}`} {...row} />
           ))}
         </main>
       ) : (

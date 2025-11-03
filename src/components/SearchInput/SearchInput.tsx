@@ -15,11 +15,15 @@ export const SearchInput = ({
         onChange={(e) => {
           onChange?.(e.target.value);
         }}
-        onBlur={() => {
-          track("searched", {
-            query: value ?? "",
-          });
-        }}
+        onBlur={
+          import.meta.env.PROD
+            ? () => {
+                track("searched", {
+                  query: value ?? "",
+                });
+              }
+            : undefined
+        }
         className={classes.Input}
         id="searchInput"
         type="search"
