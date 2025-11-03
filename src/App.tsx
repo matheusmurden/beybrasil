@@ -98,16 +98,16 @@ function App() {
           <a
             target="_blank"
             rel="noreferer"
-            href="https://instagram.com/wiivern"
+            href="https://instagram.com/wy.ver.n"
             onClick={() => {
               track("click", {
-                text: "@wiivern",
+                text: "@wy.ver.n",
                 location: "footer",
-                href: "https://instagram.com/wiivern",
+                href: "https://instagram.com/wy.ver.n",
               });
             }}
           >
-            @wiivern
+            @wy.ver.n
           </a>{" "}
           ,{" "}
           <a
