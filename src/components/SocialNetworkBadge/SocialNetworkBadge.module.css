@@ -1,4 +1,10 @@
 .Badge {
+    --instagram: #ffebfa;
+    --whatsapp: #e4f3e5;
+    --tiktok: #ebebeb;
+    --youtube: #f5dddd;
+    --externalLink: #ebebeb;
+
     height: 32px;
     width: 32px;
     border-radius: 5px;
@@ -13,18 +19,28 @@
     }
 
     &.instagram {
-        background-color: #ffebfa;
+        background-color: var(--instagram);
     }
     &.whatsapp {
-        background-color: #e4f3e5;
+        background-color: var(--whatsapp);
     }
     &.tiktok {
-        background-color: #ebebeb;
+        background-color: var(--tiktok);
     }
     &.youtube {
-        background-color: #f5dddd;
+        background-color: var(--youtube);
     }
     &.externalLink {
-        background-color: #ebebeb;
+        background-color: var(--externalLink);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        & {
+            --instagram: #3c3c3c;
+            --whatsapp: #3c3c3c;
+            --tiktok: #3c3c3c;
+            --youtube: #3c3c3c;
+            --externalLink: #3c3c3c;
+        }
     }
 }
