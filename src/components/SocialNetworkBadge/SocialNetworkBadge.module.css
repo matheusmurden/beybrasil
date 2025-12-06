@@ -1,0 +1,30 @@
+.Badge {
+    height: 32px;
+    width: 32px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .Link {
+        aspect-ratio: 1/1;
+        height: 24px;
+        display: inline-block;
+    }
+
+    &.instagram {
+        background-color: #ffebfa;
+    }
+    &.whatsapp {
+        background-color: #e4f3e5;
+    }
+    &.tiktok {
+        background-color: #ebebeb;
+    }
+    &.youtube {
+        background-color: #f5dddd;
+    }
+    &.externalLink {
+        background-color: #ebebeb;
+    }
+}

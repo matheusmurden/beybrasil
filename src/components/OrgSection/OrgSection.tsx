@@ -1,6 +1,6 @@
-import { track } from "@vercel/analytics";
 import { getRowArrValues } from "../../utils";
 import classes from "./OrgSection.module.css";
+import { SocialNetworkBadge } from "../SocialNetworkBadge";
 
 export interface OrgSectionProps {
   acronym: string;
@@ -8,7 +8,11 @@ export interface OrgSectionProps {
   region?: string;
   states?: string[];
   cities?: string[];
-  instagram?: string[];
+  instagram?: string;
+  whatsapp?: string;
+  youtube?: string;
+  tiktok?: string;
+  externalLinks?: string;
 }
 
 export const OrgSection: React.FC<OrgSectionProps> = (props) => {
@@ -22,27 +26,48 @@ export const OrgSection: React.FC<OrgSectionProps> = (props) => {
         <p>{props.region}</p>
         <p>Estado(s): {getRowArrValues(props.states ?? [])}</p>
         <p>Cidade(s): {getRowArrValues(props.cities ?? [])}</p>
-        {!!props.instagram?.[1] && (
-          <p>
-            <a
-              target="_blank"
-              rel="noreferer"
-              href={props.instagram?.[1]}
-              onClick={
-                import.meta.env.PROD
-                  ? () => {
-                      track("Org Instagram Click", {
-                        org: props.acronym,
-                        orgName: props.name,
-                      });
-                    }
-                  : undefined
-              }
-            >
-              {props.instagram?.[0] ?? ""}
-            </a>
-          </p>
-        )}
+        <div className={classes.SocialNetworks}>
+          {!!props.instagram && (
+            <SocialNetworkBadge
+              name={props.name}
+              acronym={props.acronym}
+              networkType="instagram"
+              networkValue={props.instagram}
+            />
+          )}
+          {!!props.whatsapp && (
+            <SocialNetworkBadge
+              name={props.name}
+              acronym={props.acronym}
+              networkType="whatsapp"
+              networkValue={props.whatsapp}
+            />
+          )}
+          {!!props.tiktok && (
+            <SocialNetworkBadge
+              name={props.name}
+              acronym={props.acronym}
+              networkType="tiktok"
+              networkValue={props.tiktok}
+            />
+          )}
+          {!!props.youtube && (
+            <SocialNetworkBadge
+              name={props.name}
+              acronym={props.acronym}
+              networkType="youtube"
+              networkValue={props.youtube}
+            />
+          )}
+          {!!props.externalLinks && (
+            <SocialNetworkBadge
+              name={props.name}
+              acronym={props.acronym}
+              networkType="externalLink"
+              networkValue={props.externalLinks}
+            />
+          )}
+        </div>
       </div>
     </section>
   );
