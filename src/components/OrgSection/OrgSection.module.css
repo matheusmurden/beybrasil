@@ -10,6 +10,14 @@
     content-visibility: auto;
     z-index: 1;
 
+    .SocialNetworks {
+        display: flex;
+        flex-direction: row;
+        gap: 0.64rem;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
     h1 {
         font-weight: 600;
         line-height: 1.4;

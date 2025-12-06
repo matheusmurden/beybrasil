@@ -1,6 +1,6 @@
-import { track } from "@vercel/analytics";
 import { getRowArrValues } from "../../utils";
 import classes from "./OrgSection.module.css";
+import { SocialNetworkBadge } from "../SocialNetworkBadge";
 
 export interface OrgSectionProps {
   acronym: string;
@@ -26,111 +26,46 @@ export const OrgSection: React.FC<OrgSectionProps> = (props) => {
         <p>{props.region}</p>
         <p>Estado(s): {getRowArrValues(props.states ?? [])}</p>
         <p>Cidade(s): {getRowArrValues(props.cities ?? [])}</p>
-        <div style={{ display: "flex", flexDirection: "row", gap: "0.6rem" }}>
+        <div className={classes.SocialNetworks}>
           {!!props.instagram && (
-            <p>
-              <a
-                target="_blank"
-                rel="noreferer"
-                href={`https://www.instagram.com/${props.instagram?.replace("@", "")}`}
-                onClick={
-                  import.meta.env.PROD
-                    ? () => {
-                        track("Org Instagram Click", {
-                          org: props.acronym,
-                          orgName: props.name,
-                        });
-                      }
-                    : undefined
-                }
-              >
-                {props.instagram}
-              </a>
-            </p>
+            <SocialNetworkBadge
+              name={props.name}
+              acronym={props.acronym}
+              networkType="instagram"
+              networkValue={props.instagram}
+            />
           )}
           {!!props.whatsapp && (
-            <p>
-              <a
-                target="_blank"
-                rel="noreferer"
-                href={props.whatsapp}
-                onClick={
-                  import.meta.env.PROD
-                    ? () => {
-                        track("Org WhatsApp Click", {
-                          org: props.acronym,
-                          orgName: props.name,
-                        });
-                      }
-                    : undefined
-                }
-              >
-                WhatsApp
-              </a>
-            </p>
+            <SocialNetworkBadge
+              name={props.name}
+              acronym={props.acronym}
+              networkType="whatsapp"
+              networkValue={props.whatsapp}
+            />
           )}
           {!!props.tiktok && (
-            <p>
-              <a
-                target="_blank"
-                rel="noreferer"
-                href={props.tiktok}
-                onClick={
-                  import.meta.env.PROD
-                    ? () => {
-                        track("Org TikTok Click", {
-                          org: props.acronym,
-                          orgName: props.name,
-                        });
-                      }
-                    : undefined
-                }
-              >
-                TikTok
-              </a>
-            </p>
+            <SocialNetworkBadge
+              name={props.name}
+              acronym={props.acronym}
+              networkType="tiktok"
+              networkValue={props.tiktok}
+            />
           )}
           {!!props.youtube && (
-            <p>
-              <a
-                target="_blank"
-                rel="noreferer"
-                href={props.youtube}
-                onClick={
-                  import.meta.env.PROD
-                    ? () => {
-                        track("Org YouTube Click", {
-                          org: props.acronym,
-                          orgName: props.name,
-                        });
-                      }
-                    : undefined
-                }
-              >
-                YouTube
-              </a>
-            </p>
+            <SocialNetworkBadge
+              name={props.name}
+              acronym={props.acronym}
+              networkType="youtube"
+              networkValue={props.youtube}
+            />
           )}
           {!!props.externalLinks && (
-            <p>
-              <a
-                target="_blank"
-                rel="noreferer"
-                href={props.externalLinks}
-                onClick={
-                  import.meta.env.PROD
-                    ? () => {
-                        track("Org LinkTree Click", {
-                          org: props.acronym,
-                          orgName: props.name,
-                        });
-                      }
-                    : undefined
-                }
-              >
-                LinkTree
-              </a>
-            </p>
+            <SocialNetworkBadge
+              name={props.name}
+              acronym={props.acronym}
+              networkType="externalLink"
+              networkValue={props.externalLinks}
+            />
           )}
         </div>
       </div>
