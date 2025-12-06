@@ -1,6 +1,7 @@
 import { Fragment } from "react/jsx-runtime";
 import "./App.css";
 import jsonData from "./assets/data.json";
+import manualContent from "./assets/manualContent.json";
 import { OrgSection, SearchInput } from "./components";
 import { useMemo, useState } from "react";
 import { track } from "@vercel/analytics";
@@ -26,7 +27,13 @@ function App() {
       {filteredData.length > 0 ? (
         <main>
           {filteredData?.map((row) => (
-            <OrgSection key={`row-${row?.acronym}`} {...row} />
+            <OrgSection
+              key={`row-${row?.acronym}`}
+              {...row}
+              {...manualContent?.[
+                row?.acronym?.toLowerCase() as keyof typeof manualContent
+              ]}
+            />
           ))}
         </main>
       ) : (

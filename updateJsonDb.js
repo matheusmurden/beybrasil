@@ -13,12 +13,6 @@ const formatArrayValue = (value) => {
   return formatted.includes(",") ? value.split(",") : [formatted];
 };
 
-const formatInstagramValue = (value) => {
-  return !!value
-    ? [value, value?.replace("@", "https://www.instagram.com/")]
-    : [];
-};
-
 if (fs.existsSync(csvFilePath)) {
   fs.unlinkSync(csvFilePath);
 }
@@ -35,13 +29,21 @@ await fetch(downloadUrl)
   .then(async () => {
     await csvToJson({
       noheader: false,
-      headers: ["acronym", "name", "cities", "states", "region", "instagram"],
+      headers: [
+        "acronym",
+        "name",
+        "cities",
+        "states",
+        "region",
+        "country",
+        "instagram",
+      ],
       checkType: true,
       colParser: {
         cities: (value) => formatArrayValue(value),
         states: (value) => formatArrayValue(value),
-        instagram: (value) => formatInstagramValue(value),
       },
+      ignoreColumns: /country/,
     })
       .fromFile(csvFilePath)
       .then((orgsJson) => {

@@ -8,7 +8,11 @@ export interface OrgSectionProps {
   region?: string;
   states?: string[];
   cities?: string[];
-  instagram?: string[];
+  instagram?: string;
+  whatsapp?: string;
+  youtube?: string;
+  tiktok?: string;
+  externalLinks?: string;
 }
 
 export const OrgSection: React.FC<OrgSectionProps> = (props) => {
@@ -22,27 +26,113 @@ export const OrgSection: React.FC<OrgSectionProps> = (props) => {
         <p>{props.region}</p>
         <p>Estado(s): {getRowArrValues(props.states ?? [])}</p>
         <p>Cidade(s): {getRowArrValues(props.cities ?? [])}</p>
-        {!!props.instagram?.[1] && (
-          <p>
-            <a
-              target="_blank"
-              rel="noreferer"
-              href={props.instagram?.[1]}
-              onClick={
-                import.meta.env.PROD
-                  ? () => {
-                      track("Org Instagram Click", {
-                        org: props.acronym,
-                        orgName: props.name,
-                      });
-                    }
-                  : undefined
-              }
-            >
-              {props.instagram?.[0] ?? ""}
-            </a>
-          </p>
-        )}
+        <div style={{ display: "flex", flexDirection: "row", gap: "0.6rem" }}>
+          {!!props.instagram && (
+            <p>
+              <a
+                target="_blank"
+                rel="noreferer"
+                href={`https://www.instagram.com/${props.instagram?.replace("@", "")}`}
+                onClick={
+                  import.meta.env.PROD
+                    ? () => {
+                        track("Org Instagram Click", {
+                          org: props.acronym,
+                          orgName: props.name,
+                        });
+                      }
+                    : undefined
+                }
+              >
+                {props.instagram}
+              </a>
+            </p>
+          )}
+          {!!props.whatsapp && (
+            <p>
+              <a
+                target="_blank"
+                rel="noreferer"
+                href={props.whatsapp}
+                onClick={
+                  import.meta.env.PROD
+                    ? () => {
+                        track("Org WhatsApp Click", {
+                          org: props.acronym,
+                          orgName: props.name,
+                        });
+                      }
+                    : undefined
+                }
+              >
+                WhatsApp
+              </a>
+            </p>
+          )}
+          {!!props.tiktok && (
+            <p>
+              <a
+                target="_blank"
+                rel="noreferer"
+                href={props.tiktok}
+                onClick={
+                  import.meta.env.PROD
+                    ? () => {
+                        track("Org TikTok Click", {
+                          org: props.acronym,
+                          orgName: props.name,
+                        });
+                      }
+                    : undefined
+                }
+              >
+                TikTok
+              </a>
+            </p>
+          )}
+          {!!props.youtube && (
+            <p>
+              <a
+                target="_blank"
+                rel="noreferer"
+                href={props.youtube}
+                onClick={
+                  import.meta.env.PROD
+                    ? () => {
+                        track("Org YouTube Click", {
+                          org: props.acronym,
+                          orgName: props.name,
+                        });
+                      }
+                    : undefined
+                }
+              >
+                YouTube
+              </a>
+            </p>
+          )}
+          {!!props.externalLinks && (
+            <p>
+              <a
+                target="_blank"
+                rel="noreferer"
+                href={props.externalLinks}
+                onClick={
+                  import.meta.env.PROD
+                    ? () => {
+                        track("Org LinkTree Click", {
+                          org: props.acronym,
+                          orgName: props.name,
+                        });
+                      }
+                    : undefined
+                }
+              >
+                LinkTree
+              </a>
+            </p>
+          )}
+        </div>
       </div>
     </section>
   );
