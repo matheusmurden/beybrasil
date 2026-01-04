@@ -6,7 +6,7 @@ import { OrgSection, SearchInput } from "./components";
 import { useMemo, useState } from "react";
 import { track } from "@vercel/analytics";
 
-function App() {
+export default function App() {
   const [searchQuery, setSearchQuery] = useState<string>();
   const filteredData = useMemo(() => {
     return jsonData.filter((i) =>
@@ -18,7 +18,7 @@ function App() {
 
   return (
     <Fragment>
-      <header style={{ textAlign: "center" }}>
+      <header className="text-center w-full my-12">
         <h1 style={{ color: "rgba(var(--accentColor), 0.8)" }}>
           Organizações de Beyblade no Brasil
         </h1>
@@ -43,7 +43,7 @@ function App() {
           Nenhum resultado foi encontrado para a busca "{searchQuery}"
         </h4>
       )}
-      <footer style={{ fontSize: 13, position: "absolute", bottom: 0 }}>
+      <footer className="text-xs">
         <p>
           Website criado por{" "}
           <a
@@ -99,5 +99,3 @@ function App() {
     </Fragment>
   );
 }
-
-export default App;
