@@ -22,7 +22,7 @@ export const SocialNetworkBadge: React.FC<SocialNetworkBadgeProps> = ({
   networkType,
   networkValue,
 }) => {
-  const imageUrl = new URL(`/icons/${networkType}.svg`, import.meta.url).href;
+  const imageUrl = `/icons/${networkType}.svg`;
   return (
     <div className={classNames(classes.Badge, classes[networkType])}>
       <a
