@@ -23,6 +23,7 @@ export const links: LinksFunction = () => [
   },
   { rel: "shortcut icon", href: "/vite.svg", type: "image/svg" },
   { rel: "icon", href: "/vite.svg", type: "image/svg" },
+  { rel: "manifest", href: "/manifest.json" },
 ];
 
 export function meta() {
@@ -45,6 +46,7 @@ export function meta() {
       name: "og:url",
       content: "https://www.beybrasil.org/",
     },
+    { name: "og:image", content: "/meta_image.png" },
     {
       name: "og:title",
       content: "BeyBrasil - Comunidade de BeyBlade no Brasil",
@@ -62,6 +64,7 @@ export function meta() {
       name: "twitter:url",
       content: "https://www.beybrasil.org/",
     },
+    { name: "twitter:image", content: "/meta_image.png" },
     {
       name: "twitter:title",
       content: "BeyBrasil - Comunidade de BeyBlade no Brasil",
@@ -80,8 +83,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="og:image" content="/meta_image.png" />
-        <meta name="twitter:image" content="/meta_image.png" />
         <Meta />
         <Links />
       </head>
