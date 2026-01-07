@@ -1,3 +1,4 @@
+import "@mantine/core/styles.css";
 import "./index.css";
 import { Analytics } from "@vercel/analytics/react";
 import type { ErrorResponse, LinksFunction } from "react-router";
@@ -6,9 +7,26 @@ import {
   Links,
   Meta,
   Outlet,
+  redirect,
   Scripts,
   ScrollRestoration,
+  useNavigate,
 } from "react-router";
+import { AuthContextProvider, SearchContextProvider } from "./contexts";
+import {
+  ActionIcon,
+  AppShell,
+  AppShellHeader,
+  ColorSchemeScript,
+  createTheme,
+  MantineProvider,
+  Tooltip,
+} from "@mantine/core";
+import type { Route } from "./+types/root";
+import { destroySession, getSession } from "./sessions.server";
+import { isAfter } from "date-fns";
+import { LoginButton, SearchInput } from "./components";
+import { useLocation } from "react-router";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -77,30 +95,88 @@ export function meta() {
   ];
 }
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export async function loader({ request }: Route.LoaderArgs) {
+  const session = await getSession(request.headers.get("Cookie"));
+  const tokenExpiresAt = session.get("startgg:expires");
+  if (!!tokenExpiresAt && isAfter(new Date(), new Date(tokenExpiresAt))) {
+    try {
+      session.unset("startgg:token");
+      session.unset("startgg:expires");
+      session.unset("startgg:refresh");
+      return redirect("/login", {
+        headers: {
+          "Set-Cookie": await destroySession(session),
+        },
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  return {};
+}
+
+export default function Layout() {
+  const theme = createTheme({
+    fontFamily: "Recursive, system-ui, Avenir, Helvetica, Arial, sans-serif",
+    fontFamilyMonospace: "Monaco, Courier, monospace",
+    headings: { fontFamily: "Outfit, sans-serif" },
+    primaryColor: "violet",
+    primaryShade: 6,
+  });
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isLoginRoute = location.pathname === "/login";
   return (
     <html lang="pt-br">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <ColorSchemeScript />
         <Meta />
         <Links />
       </head>
       <body>
-        {children}
+        <MantineProvider theme={theme}>
+          <Analytics />
+          <AuthContextProvider>
+            <SearchContextProvider>
+              <AppShell className="w-full h-screen">
+                <AppShellHeader
+                  withBorder={false}
+                  className="w-full flex px-12 py-2 justify-between items-center"
+                >
+                  {isLoginRoute && (
+                    <Tooltip label="Voltar">
+                      <ActionIcon
+                        variant="subtle"
+                        size={42}
+                        color="dark"
+                        onClick={() => navigate("/")}
+                      >
+                        &larr;
+                      </ActionIcon>
+                    </Tooltip>
+                  )}
+                  {!isLoginRoute && (
+                    <h1 className="text-2xl font-bold pointer-events-none">
+                      BeyBrasil
+                    </h1>
+                  )}
+
+                  <SearchInput />
+                  {!isLoginRoute && <LoginButton />}
+                </AppShellHeader>
+                <div className="h-screen w-full">
+                  <Outlet />
+                </div>
+              </AppShell>
+            </SearchContextProvider>
+          </AuthContextProvider>
+        </MantineProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
-  );
-}
-
-export default function Root() {
-  return (
-    <Layout>
-      <Analytics />
-      <Outlet />
-    </Layout>
   );
 }
 
