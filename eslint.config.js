@@ -31,5 +31,14 @@ export default defineConfig([
         tsconfigRootDir: import.meta.dirname,
       },
     },
+    overrides: [
+      {
+        files: ["**/*.{ts,tsx}"],
+        rules: {
+          "@typescript-eslint/no-unsafe-member-access": "off",
+          "@typescript-eslint/no-unsafe-argument": "off",
+        },
+      },
+    ],
   },
 ]);

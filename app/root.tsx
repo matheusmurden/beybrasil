@@ -9,6 +9,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import { AuthContextProvider } from "./contexts";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -99,7 +100,9 @@ export default function Root() {
   return (
     <Layout>
       <Analytics />
-      <Outlet />
+      <AuthContextProvider>
+        <Outlet />
+      </AuthContextProvider>
     </Layout>
   );
 }
