@@ -12,7 +12,11 @@ import {
   ScrollRestoration,
   useNavigate,
 } from "react-router";
-import { AuthContextProvider, SearchContextProvider } from "./contexts";
+import {
+  UserContextProvider,
+  SearchContextProvider,
+  ApolloContextProvider,
+} from "./contexts";
 import {
   ActionIcon,
   AppShell,
@@ -97,6 +101,7 @@ export function meta() {
 
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
+  const token = session.get("startgg:token");
   const tokenExpiresAt = session.get("startgg:expires");
   if (!!tokenExpiresAt && isAfter(new Date(), new Date(tokenExpiresAt))) {
     try {
@@ -112,10 +117,10 @@ export async function loader({ request }: Route.LoaderArgs) {
       console.log(e);
     }
   }
-  return {};
+  return { token };
 }
 
-export default function Layout() {
+export default function Layout({ loaderData }: Route.ComponentProps) {
   const theme = createTheme({
     fontFamily: "Recursive, system-ui, Avenir, Helvetica, Arial, sans-serif",
     fontFamilyMonospace: "Monaco, Courier, monospace",
@@ -125,7 +130,7 @@ export default function Layout() {
   });
   const navigate = useNavigate();
   const location = useLocation();
-  const isLoginRoute = location.pathname === "/login";
+  const isLoginRoute = ["/login", "/logout"].includes(location.pathname);
   return (
     <html lang="pt-br">
       <head>
@@ -138,40 +143,42 @@ export default function Layout() {
       <body>
         <MantineProvider theme={theme}>
           <Analytics />
-          <AuthContextProvider>
-            <SearchContextProvider>
-              <AppShell className="w-full h-screen">
-                <AppShellHeader
-                  withBorder={false}
-                  className="w-full flex px-12 py-2 justify-between items-center"
-                >
-                  {isLoginRoute && (
-                    <Tooltip label="Voltar">
-                      <ActionIcon
-                        variant="subtle"
-                        size={42}
-                        color="dark"
-                        onClick={() => navigate("/")}
-                      >
-                        &larr;
-                      </ActionIcon>
-                    </Tooltip>
-                  )}
-                  {!isLoginRoute && (
-                    <h1 className="text-2xl font-bold pointer-events-none">
-                      BeyBrasil
-                    </h1>
-                  )}
+          <UserContextProvider>
+            <ApolloContextProvider token={loaderData?.token}>
+              <SearchContextProvider>
+                <AppShell className="w-full h-screen">
+                  <AppShellHeader
+                    withBorder={false}
+                    className="w-full flex px-12 py-2 justify-between items-center"
+                  >
+                    {isLoginRoute && (
+                      <Tooltip label="Voltar">
+                        <ActionIcon
+                          variant="subtle"
+                          size={42}
+                          color="dark"
+                          onClick={() => navigate("/")}
+                        >
+                          &larr;
+                        </ActionIcon>
+                      </Tooltip>
+                    )}
+                    {!isLoginRoute && (
+                      <h1 className="text-2xl font-bold pointer-events-none">
+                        BeyBrasil
+                      </h1>
+                    )}
 
-                  <SearchInput />
-                  {!isLoginRoute && <LoginButton />}
-                </AppShellHeader>
-                <div className="h-screen w-full">
-                  <Outlet />
-                </div>
-              </AppShell>
-            </SearchContextProvider>
-          </AuthContextProvider>
+                    <SearchInput />
+                    {!isLoginRoute && <LoginButton />}
+                  </AppShellHeader>
+                  <div className="h-screen w-full">
+                    <Outlet />
+                  </div>
+                </AppShell>
+              </SearchContextProvider>
+            </ApolloContextProvider>
+          </UserContextProvider>
         </MantineProvider>
         <ScrollRestoration />
         <Scripts />

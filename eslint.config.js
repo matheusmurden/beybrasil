@@ -12,6 +12,7 @@ export default defineConfig([
     "build",
     "react-router.config.ts",
     ".react-router/types/*",
+    "./graphql/*",
   ]),
   {
     files: ["**/*.{ts,tsx}"],

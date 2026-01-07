@@ -21,16 +21,16 @@ export interface User {
   };
 }
 
-interface AuthContextProps {
+interface UserContextProps {
   user?: User;
   setUser?: Dispatch<SetStateAction<User | undefined>>;
 }
 
-export const AuthContext = createContext<AuthContextProps>({});
+export const UserContext = createContext<UserContextProps>({});
 
-export const AuthContextProvider: FC<PropsWithChildren> = ({ children }) => {
+export const UserContextProvider: FC<PropsWithChildren> = ({ children }) => {
   const [user, setUser] = useState<User>();
-  return <AuthContext value={{ user, setUser }}>{children}</AuthContext>;
+  return <UserContext value={{ user, setUser }}>{children}</UserContext>;
 };
 
-export const useAuthContext = () => use(AuthContext);
+export const useUserContext = () => use(UserContext);

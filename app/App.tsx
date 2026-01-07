@@ -3,34 +3,11 @@ import "./App.css";
 import jsonData from "./assets/data.json";
 import manualContent from "./assets/manualContent.json";
 import { OrgSection } from "./components";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { track } from "@vercel/analytics";
-import { useAuthContext, useSearchContext, type User } from "./contexts";
-import type { Route } from "./+types/App";
-import { getSession } from "./sessions.server";
+import { useSearchContext } from "./contexts";
 
-export async function loader({ request }: Route.LoaderArgs) {
-  const session = await getSession(request.headers.get("Cookie"));
-  const token = session.get("startgg:token");
-  let result;
-  if (token) {
-    const response = await fetch("https://api.start.gg/gql/alpha", {
-      method: "POST",
-      body: `{"query": "{ currentUser {id images { url type } discriminator birthday name genderPronoun email player { prefix gamerTag recentStandings(videogameId: 87913, limit: 20) { placement metadata entrant { event { name } } } } } }" }`,
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    result = (await response.json()) as { data: { currentUser: User } };
-  }
-  return {
-    token,
-    userData: result?.data,
-  };
-}
-
-export default function App({ loaderData }: Route.ComponentProps) {
+export default function App() {
   const { query } = useSearchContext();
   const filteredData = useMemo(() => {
     return jsonData.filter((i) =>
@@ -40,12 +17,6 @@ export default function App({ loaderData }: Route.ComponentProps) {
     );
   }, [query]);
 
-  const { setUser } = useAuthContext();
-  useEffect(() => {
-    if (loaderData?.userData) {
-      setUser?.(loaderData?.userData?.currentUser);
-    }
-  });
   return (
     <Fragment>
       {filteredData.length > 0 ? (

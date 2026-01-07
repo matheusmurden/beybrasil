@@ -5,17 +5,51 @@ import {
   useCombobox,
   type ButtonProps,
 } from "@mantine/core";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { useAuthContext, type User } from "~/contexts";
+import { useUserContext, type User } from "~/contexts";
 import { authUrl } from "~/startgg.client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
+
+const UserQuery = gql(`
+  query User {
+    currentUser {
+      id
+      images {
+        url
+        type
+      }
+      discriminator
+      birthday
+      name
+      genderPronoun
+      email
+      player {
+        prefix
+        gamerTag
+        recentStandings(videogameId: 87913, limit: 20) {
+          placement
+          metadata
+          entrant {
+            event {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+`);
 
 export const LoginButton = ({
   size = "sm",
 }: {
   size?: ButtonProps["size"];
 }) => {
-  const { user } = useAuthContext();
+  const { user, setUser } = useUserContext();
+
+  const { data } = useQuery<{ currentUser: User }>(UserQuery);
 
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
@@ -40,6 +74,12 @@ export const LoginButton = ({
     )?.url;
     return img;
   }, [user]);
+
+  useEffect(() => {
+    if (data) {
+      setUser?.(data?.currentUser);
+    }
+  }, [data, setUser]);
 
   if (user?.id) {
     return (
