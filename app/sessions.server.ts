@@ -16,6 +16,7 @@ const cookie = createCookie("__session", {
   domain: import.meta.env.PROD ? "beybrasil.org" : "localhost",
   secure: import.meta.env.PROD,
   maxAge: 604_800,
+  secrets: ["l3t-1t-r1p"],
 });
 
 const { getSession, commitSession, destroySession } =

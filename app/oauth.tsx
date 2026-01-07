@@ -31,23 +31,29 @@ export async function loader({ request }: Route.LoaderArgs) {
   const state = searchParams.get("state")!;
 
   if (!state || !code) {
-    throw new Response("Bad request. Try again.", {
+    throw new Response("Bad request.", {
       status: 400,
     });
   }
-  const tokens = await startgg.validateAuthorizationCode(code, scopes);
-  const accessToken = tokens.accessToken();
-  const accessTokenExpiresAt = tokens.accessTokenExpiresAt();
-  const refreshToken = tokens.refreshToken();
+  try {
+    const tokens = await startgg.validateAuthorizationCode(code, scopes);
+    const accessToken = tokens.accessToken();
+    const accessTokenExpiresAt = tokens.accessTokenExpiresAt();
+    const refreshToken = tokens.refreshToken();
 
-  const session = await getSession(request.headers.get("Cookie"));
-  session.set("startgg:token", accessToken);
-  session.set("startgg:expires", accessTokenExpiresAt.toUTCString());
-  session.set("startgg:refresh", refreshToken);
+    const session = await getSession(request.headers.get("Cookie"));
+    session.set("startgg:token", accessToken);
+    session.set("startgg:expires", accessTokenExpiresAt.toUTCString());
+    session.set("startgg:refresh", refreshToken);
 
-  return redirect("/", {
-    headers: {
-      "Set-Cookie": await commitSession(session),
-    },
-  });
+    return redirect("/", {
+      headers: {
+        "Set-Cookie": await commitSession(session),
+      },
+    });
+  } catch {
+    throw new Response("Something went wrong. Try again later.", {
+      status: 400,
+    });
+  }
 }

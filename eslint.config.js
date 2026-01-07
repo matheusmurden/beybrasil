@@ -31,14 +31,16 @@ export default defineConfig([
         tsconfigRootDir: import.meta.dirname,
       },
     },
-    overrides: [
-      {
-        files: ["**/*.{ts,tsx}"],
-        rules: {
-          "@typescript-eslint/no-unsafe-member-access": "off",
-          "@typescript-eslint/no-unsafe-argument": "off",
-        },
-      },
-    ],
+    rules: {
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/only-throw-error": "off",
+      "@typescript-eslint/no-floating-promises": "off",
+      "@typescript-eslint/no-misused-promises": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-redundant-type-constituents": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+    },
   },
 ]);

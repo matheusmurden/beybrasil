@@ -1,25 +1,21 @@
+import { useSearchContext } from "~/contexts";
 import classes from "./SearchInput.module.css";
 import { track } from "@vercel/analytics";
 
-export const SearchInput = ({
-  value,
-  onChange,
-}: {
-  value?: string;
-  onChange?: (val: string) => void;
-}) => {
-  return (
+export const SearchInput = () => {
+  const { query, setQuery, isSearchPage } = useSearchContext();
+  return isSearchPage ? (
     <section className={classes.Container}>
       <input
-        value={value}
+        value={query}
         onChange={(e) => {
-          onChange?.(e.target.value);
+          setQuery?.(e.target.value);
         }}
         onBlur={
           import.meta.env.PROD
             ? () => {
                 track("searched", {
-                  query: value ?? "",
+                  query: query ?? "",
                 });
               }
             : undefined
@@ -30,5 +26,7 @@ export const SearchInput = ({
         placeholder="Digite para buscar..."
       />
     </section>
+  ) : (
+    <></>
   );
 };

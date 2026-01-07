@@ -1,7 +1,7 @@
 .OrgSection {
   will-change: box-shadow;
   transition: box-shadow 0ms;
-  border: 1px solid rgba(var(--accentColor), 0.1);
+  border: 0.5px solid var(--accentColor);
   border-radius: 5px;
   padding: 1rem;
   display: flex;
@@ -46,14 +46,12 @@
       font-style 250ms ease-in-out;
   }
   &:hover {
-    box-shadow: 0 0 0 2px rgba(var(--accentColor), 1);
+    box-shadow: 0 0 0 2px var(--accentColor);
     h1 {
-      color: rgb(var(--accentColor));
       font-weight: 800;
       font-style: oblique;
     }
     h2 {
-      color: rgb(var(--accentColor));
       font-weight: 700;
     }
   }

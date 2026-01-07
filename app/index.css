@@ -1,35 +1,51 @@
-@import "tailwindcss";
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+
+:root {
+  --gridColumns: 3;
+  --accentColor: var(--mantine-primary-color-8);
+  accent-color: var(--accentColor);
+  line-height: 1.5;
+  font-weight: 400;
+  --textColor: #333333;
+  --bgColor: #fafafa;
+  color-scheme: light dark;
+  --mantine-color-text: var(--textColor) !important;
+  --mantine-color-body: var(--bgColor) !important;
+
+  * {
+    box-sizing: border-box !important;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+h1,
+h2 {
+  color: var(--mantine-primary-color-8);
+}
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
 
-* {
-  box-sizing: border-box !important;
-}
-
-:root {
-  font-family: "Recursive", system-ui, Avenir, Helvetica, Arial, sans-serif;
-  --gridColumns: 3;
-  --accentColor: 64, 50, 142;
-  accent-color: rgba(var(--accentColor), 1);
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 @media (prefers-color-scheme: dark) {
   :root {
-    --accentColor: 35, 206, 107;
+    --accentColor: var(--mantine-primary-color-8);
+    --textColor: #fafafa;
+    --bgColor: #242424;
+    --mantine-color-text: var(--textColor) !important;
+    --mantine-color-body: var(--bgColor) !important;
+  }
+  h1,
+  h2 {
+    color: var(--mantine-primary-color-2);
   }
 }
 
@@ -56,4 +72,43 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+@media (max-width: 819px) {
+  :root {
+    --gridColumns: 1;
+  }
+  body {
+    padding: 0 2rem 0 2rem;
+  }
+  header h1 {
+    font-size: 2.4rem;
+  }
+}
+@media (min-width: 820px) {
+  :root {
+    --gridColumns: 2;
+  }
+  body {
+    padding: 0 3rem 0 3rem;
+  }
+  header h1 {
+    font-size: 2.8rem;
+  }
+}
+@media (min-width: 1280px) {
+  :root {
+    --gridColumns: 3;
+  }
+  body {
+    padding: 0 6rem 0 6rem;
+  }
+  header h1 {
+    font-size: 3.2rem;
+  }
+}
+@media (min-width: 1600px) {
+  :root {
+    --gridColumns: 4;
+  }
 }
