@@ -1,11 +1,12 @@
 import { Fragment } from "react/jsx-runtime";
-import "./App.css";
+import classes from "./App.module.css";
 import jsonData from "./assets/data.json";
 import manualContent from "./assets/manualContent.json";
 import { OrgSection } from "./components";
 import { useMemo } from "react";
 import { track } from "@vercel/analytics";
 import { useSearchContext } from "./contexts";
+import classNames from "classnames";
 
 export default function App() {
   const { query } = useSearchContext();
@@ -20,7 +21,7 @@ export default function App() {
   return (
     <Fragment>
       {filteredData.length > 0 ? (
-        <main className="mt-24">
+        <div className={classNames(classes.Container, "pt-24")}>
           {filteredData?.map((row) => (
             <OrgSection
               key={`row-${row?.acronym}`}
@@ -30,7 +31,7 @@ export default function App() {
               ]}
             />
           ))}
-        </main>
+        </div>
       ) : (
         <h4
           style={{ margin: "0 auto", textAlign: "center", minHeight: "50vh" }}

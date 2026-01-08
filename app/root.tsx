@@ -21,8 +21,13 @@ import {
   ActionIcon,
   AppShell,
   AppShellHeader,
+  AppShellMain,
+  AppShellNavbar,
+  Burger,
+  CloseButton,
   ColorSchemeScript,
   createTheme,
+  Group,
   MantineProvider,
   Tooltip,
 } from "@mantine/core";
@@ -31,6 +36,7 @@ import { destroySession, getSession } from "./sessions.server";
 import { isAfter } from "date-fns";
 import { LoginButton, SearchInput } from "./components";
 import { useLocation } from "react-router";
+import { useDisclosure } from "@mantine/hooks";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -131,6 +137,8 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const isLoginRoute = ["/login", "/logout"].includes(location.pathname);
+  const isIndexRoute = location.pathname === "/";
+  const [opened, { toggle }] = useDisclosure();
   return (
     <html lang="pt-br">
       <head>
@@ -146,16 +154,24 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
           <UserContextProvider>
             <ApolloContextProvider token={loaderData?.token}>
               <SearchContextProvider>
-                <AppShell className="w-full h-screen">
+                <AppShell
+                  className="w-full h-screen"
+                  navbar={{
+                    width: 300,
+                    breakpoint: "sm",
+                    collapsed: { mobile: !opened },
+                  }}
+                >
                   <AppShellHeader
                     withBorder={false}
-                    className="w-full flex px-12 py-2 justify-between items-center"
+                    className="flex px-4 py-2 min-h-20 justify-between items-center pl-4 md:pl-(--app-shell-navbar-width)"
                   >
-                    {isLoginRoute && (
+                    {!isIndexRoute && (
                       <Tooltip label="Voltar">
                         <ActionIcon
                           variant="subtle"
                           size={42}
+                          hiddenFrom="sm"
                           color="dark"
                           onClick={() => navigate("/")}
                         >
@@ -163,18 +179,55 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
                         </ActionIcon>
                       </Tooltip>
                     )}
-                    {!isLoginRoute && (
-                      <h1 className="text-2xl font-bold pointer-events-none">
-                        BeyBrasil
-                      </h1>
-                    )}
-
+                    <Group h="100%" px="md">
+                      <Burger
+                        opened={opened}
+                        onClick={toggle}
+                        hiddenFrom="sm"
+                        size="sm"
+                      />
+                    </Group>
                     <SearchInput />
-                    {!isLoginRoute && <LoginButton />}
                   </AppShellHeader>
-                  <div className="h-screen w-full">
+                  <AppShellNavbar>
+                    <aside className="w-full h-full flex flex-col px-4 py-6 justify-between">
+                      <div className="flex min-h-12 w-full justify-between items-center">
+                        {!isIndexRoute && (
+                          <Tooltip label="Voltar">
+                            <ActionIcon
+                              variant="subtle"
+                              size={42}
+                              visibleFrom="sm"
+                              color="dark"
+                              onClick={() => navigate("/")}
+                            >
+                              &larr;
+                            </ActionIcon>
+                          </Tooltip>
+                        )}
+                        <h1 className="ml-4 md:ml-0 md:mr-4 text-2xl font-bold pointer-events-none">
+                          BeyBrasil
+                        </h1>
+                        {opened && (
+                          <Group className="ml-auto" h="100%" px="md">
+                            <CloseButton
+                              onClick={toggle}
+                              hiddenFrom="sm"
+                              size="md"
+                            />
+                          </Group>
+                        )}
+                      </div>
+                      {!isLoginRoute && (
+                        <div className="ml-4 md:ml-0">
+                          <LoginButton toggleSidebar={toggle} />
+                        </div>
+                      )}
+                    </aside>
+                  </AppShellNavbar>
+                  <AppShellMain className="h-screen w-full">
                     <Outlet />
-                  </div>
+                  </AppShellMain>
                 </AppShell>
               </SearchContextProvider>
             </ApolloContextProvider>

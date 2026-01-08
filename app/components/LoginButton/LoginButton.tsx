@@ -12,44 +12,35 @@ import { authUrl } from "~/startgg.client";
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 
-const UserQuery = gql(`
-  query User {
-    currentUser {
-      id
-      images {
-        url
-        type
-      }
-      discriminator
-      birthday
-      name
-      genderPronoun
-      email
-      player {
-        prefix
-        gamerTag
-        recentStandings(videogameId: 87913, limit: 20) {
-          placement
-          metadata
-          entrant {
-            event {
-              name
+const BasicUserQuery = gql(`
+    query BasicUserQuery {
+        currentUser {
+            id
+            images {
+                url
+                type
             }
-          }
+            name
+            player {
+                prefix
+                gamerTag
+            }
         }
-      }
     }
-  }
 `);
 
 export const LoginButton = ({
   size = "sm",
+  toggleSidebar,
 }: {
   size?: ButtonProps["size"];
+  toggleSidebar?: () => void;
 }) => {
   const { user, setUser } = useUserContext();
 
-  const { data } = useQuery<{ currentUser: User }>(UserQuery);
+  const { data } = useQuery<{ currentUser: User }>(BasicUserQuery, {
+    skip: Boolean(user?.id),
+  });
 
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
@@ -59,7 +50,10 @@ export const LoginButton = ({
 
   const options = [
     <Combobox.Option
-      onClick={() => navigate("/logout")}
+      onClick={() => {
+        toggleSidebar?.();
+        navigate("/logout");
+      }}
       value={"LOGOUT"}
       key={"LOGOUT"}
       className="dark:bg-neutral-800 dark:hover:bg-neutral-700"
