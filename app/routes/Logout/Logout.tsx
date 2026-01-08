@@ -1,6 +1,6 @@
 import { Form, redirect } from "react-router";
-import type { Route } from "./+types/logout";
-import { destroySession, getSession } from "./sessions.server";
+import type { Route } from "./+types/Logout";
+import { destroySession, getSession } from "~/sessions.server";
 import { Button } from "@mantine/core";
 
 export async function action({ request }: Route.LoaderArgs) {

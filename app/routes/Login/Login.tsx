@@ -1,7 +1,7 @@
 import { LoginButton } from "~/components";
-import { useUserContext } from "./contexts";
-import { getSession } from "./sessions.server";
-import type { Route } from "./+types/login";
+import { useUserContext } from "~/contexts";
+import { getSession } from "~/sessions.server";
+import type { Route } from "./+types/Login";
 import { useEffect } from "react";
 
 export async function loader({ request }: Route.LoaderArgs) {

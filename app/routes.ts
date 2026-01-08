@@ -1,8 +1,8 @@
 import { type RouteConfig, index } from "@react-router/dev/routes";
 
 export default [
-  index("./App.tsx"),
-  { path: "/oauth", file: "./oauth.tsx" },
-  { path: "/login", file: "./login.tsx" },
-  { path: "/logout", file: "./logout.tsx" },
+  index("./routes/Home/Home.tsx"),
+  { path: "/oauth", file: "./routes/OAuth/OAuth.tsx" },
+  { path: "/login", file: "./routes/Login/Login.tsx" },
+  { path: "/logout", file: "./routes/Logout/Logout.tsx" },
 ] satisfies RouteConfig;

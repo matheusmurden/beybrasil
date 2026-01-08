@@ -1,14 +1,14 @@
 import { Fragment } from "react/jsx-runtime";
-import classes from "./App.module.css";
-import jsonData from "./assets/data.json";
-import manualContent from "./assets/manualContent.json";
-import { OrgSection } from "./components";
+import jsonData from "~/assets/data.json";
+import manualContent from "~/assets/manualContent.json";
+import { OrgSection } from "~/components";
 import { useMemo } from "react";
 import { track } from "@vercel/analytics";
-import { useSearchContext } from "./contexts";
+import { useSearchContext } from "~/contexts";
 import classNames from "classnames";
+import classes from "./Home.module.css";
 
-export default function App() {
+export default function Home() {
   const { query } = useSearchContext();
   const filteredData = useMemo(() => {
     return jsonData.filter((i) =>

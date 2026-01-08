@@ -1,7 +1,7 @@
 import * as arctic from "arctic";
-import type { Route } from "./+types/oauth";
+import type { Route } from "./+types/OAuth";
 import { redirect } from "react-router";
-import { commitSession, getSession } from "./sessions.server";
+import { commitSession, getSession } from "~/sessions.server";
 
 const clientId =
   typeof import.meta.env.VITE_STARTGG_CLIENT_ID === "string"
