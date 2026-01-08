@@ -1,0 +1,1 @@
+export const BEYBLADE_X_VIDEOGAME_ID = 87913;

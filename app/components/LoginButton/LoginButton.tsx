@@ -5,17 +5,42 @@ import {
   useCombobox,
   type ButtonProps,
 } from "@mantine/core";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { useAuthContext, type User } from "~/contexts";
+import { useUserContext, type User } from "~/contexts";
 import { authUrl } from "~/startgg.client";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
+
+const BasicUserQuery = gql(`
+    query BasicUserQuery {
+        currentUser {
+            id
+            images {
+                url
+                type
+            }
+            name
+            player {
+                prefix
+                gamerTag
+            }
+        }
+    }
+`);
 
 export const LoginButton = ({
   size = "sm",
+  toggleSidebar,
 }: {
   size?: ButtonProps["size"];
+  toggleSidebar?: () => void;
 }) => {
-  const { user } = useAuthContext();
+  const { user, setUser } = useUserContext();
+
+  const { data } = useQuery<{ currentUser: User }>(BasicUserQuery, {
+    skip: Boolean(user?.id),
+  });
 
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
@@ -25,7 +50,10 @@ export const LoginButton = ({
 
   const options = [
     <Combobox.Option
-      onClick={() => navigate("/logout")}
+      onClick={() => {
+        toggleSidebar?.();
+        navigate("/logout");
+      }}
       value={"LOGOUT"}
       key={"LOGOUT"}
       className="dark:bg-neutral-800 dark:hover:bg-neutral-700"
@@ -40,6 +68,12 @@ export const LoginButton = ({
     )?.url;
     return img;
   }, [user]);
+
+  useEffect(() => {
+    if (data) {
+      setUser?.(data?.currentUser);
+    }
+  }, [data, setUser]);
 
   if (user?.id) {
     return (
