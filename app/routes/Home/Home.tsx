@@ -1,9 +1,8 @@
 import { Fragment } from "react/jsx-runtime";
 import jsonData from "~/assets/data.json";
-import manualContent from "~/assets/manualContent.json";
+import manualContent from "~/assets/manualContent.json" with { type: "json" };
 import { OrgSection } from "~/components";
 import { useMemo } from "react";
-import { track } from "@vercel/analytics";
 import { useSearchContext } from "~/contexts";
 import classNames from "classnames";
 import classes from "./Home.module.css";
@@ -39,59 +38,6 @@ export default function Home() {
           Nenhum resultado foi encontrado para a busca "{query}"
         </h4>
       )}
-      <footer className="text-xs">
-        <p>
-          Website criado por{" "}
-          <a
-            target="_blank"
-            rel="noreferer"
-            href="https://instagram.com/matheusmurden"
-            onClick={() => {
-              track("click", {
-                text: "@matheusmurden",
-                location: "footer",
-                href: "https://instagram.com/matheusmurden",
-              });
-            }}
-          >
-            @matheusmurden
-          </a>
-          .
-        </p>
-        <p>
-          Este website não seria possível sem o apoio de{" "}
-          <a
-            target="_blank"
-            rel="noreferer"
-            href="https://instagram.com/wy.ver.n"
-            onClick={() => {
-              track("click", {
-                text: "@wy.ver.n",
-                location: "footer",
-                href: "https://instagram.com/wy.ver.n",
-              });
-            }}
-          >
-            @wy.ver.n
-          </a>{" "}
-          ,{" "}
-          <a
-            target="_blank"
-            rel="noreferer"
-            href="https://instagram.com/imperadorbey"
-            onClick={() => {
-              track("click", {
-                text: "@imperadorbey",
-                location: "footer",
-                href: "https://instagram.com/imperadorbey",
-              });
-            }}
-          >
-            @imperadorbey
-          </a>{" "}
-          e de todas as organizações pelo Brasil.
-        </p>
-      </footer>
     </Fragment>
   );
 }

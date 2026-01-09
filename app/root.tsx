@@ -16,14 +16,14 @@ import {
   UserContextProvider,
   SearchContextProvider,
   ApolloContextProvider,
+  NavContextProvider,
 } from "./contexts";
 import {
   ActionIcon,
   AppShell,
-  AppShellHeader,
+  AppShellFooter,
   AppShellMain,
   AppShellNavbar,
-  Burger,
   CloseButton,
   ColorSchemeScript,
   createTheme,
@@ -34,7 +34,7 @@ import {
 import type { Route } from "./+types/root";
 import { destroySession, getSession } from "./sessions.server";
 import { isAfter } from "date-fns";
-import { LoginButton, SearchInput } from "./components";
+import { AppHeader, LoginButton } from "./components";
 import { useLocation } from "react-router";
 import { useDisclosure } from "@mantine/hooks";
 
@@ -153,83 +153,112 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
           <Analytics />
           <UserContextProvider>
             <ApolloContextProvider token={loaderData?.token}>
-              <SearchContextProvider>
-                <AppShell
-                  className="w-full h-screen"
-                  navbar={{
-                    width: 300,
-                    breakpoint: "sm",
-                    collapsed: { mobile: !opened },
-                  }}
-                >
-                  <AppShellHeader
-                    withBorder={false}
-                    className="flex px-4 py-2 min-h-20 justify-between items-center pl-4 md:pl-(--app-shell-navbar-width)"
+              <NavContextProvider>
+                <SearchContextProvider>
+                  <AppShell
+                    className="w-full h-screen"
+                    navbar={{
+                      width: 300,
+                      breakpoint: "sm",
+                      collapsed: { mobile: !opened },
+                    }}
                   >
-                    {!isIndexRoute && (
-                      <Tooltip label="Voltar">
-                        <ActionIcon
-                          variant="subtle"
-                          size={42}
-                          hiddenFrom="sm"
-                          color="dark"
-                          onClick={() => navigate("/")}
-                        >
-                          &larr;
-                        </ActionIcon>
-                      </Tooltip>
-                    )}
-                    <Group h="100%" px="md">
-                      <Burger
-                        opened={opened}
-                        onClick={toggle}
-                        hiddenFrom="sm"
-                        size="sm"
-                      />
-                    </Group>
-                    <SearchInput />
-                  </AppShellHeader>
-                  <AppShellNavbar>
-                    <aside className="w-full h-full flex flex-col px-4 py-6 justify-between">
-                      <div className="flex min-h-12 w-full justify-between items-center">
-                        {!isIndexRoute && (
-                          <Tooltip label="Voltar">
-                            <ActionIcon
-                              variant="subtle"
-                              size={42}
-                              visibleFrom="sm"
-                              color="dark"
-                              onClick={() => navigate("/")}
-                            >
-                              &larr;
-                            </ActionIcon>
-                          </Tooltip>
-                        )}
-                        <h1 className="ml-4 md:ml-0 md:mr-4 text-2xl font-bold pointer-events-none">
-                          BeyBrasil
-                        </h1>
-                        {opened && (
-                          <Group className="ml-auto" h="100%" px="md">
-                            <CloseButton
-                              onClick={toggle}
-                              hiddenFrom="sm"
-                              size="md"
-                            />
-                          </Group>
-                        )}
-                      </div>
-                      {!isLoginRoute && (
-                        <div className="ml-4 md:ml-0">
-                          <LoginButton toggleSidebar={toggle} />
+                    <AppHeader opened={opened} toggle={toggle} />
+
+                    <AppShellNavbar>
+                      <aside className="w-full h-full flex flex-col px-4 py-6 justify-between">
+                        <div className="flex min-h-12 w-full justify-between items-center">
+                          {!isIndexRoute && (
+                            <Tooltip label="Voltar">
+                              <ActionIcon
+                                variant="subtle"
+                                size={42}
+                                visibleFrom="sm"
+                                onClick={() => navigate("/")}
+                              >
+                                &larr;
+                              </ActionIcon>
+                            </Tooltip>
+                          )}
+                          <h1 className="ml-4 md:ml-0 md:mr-4 text-2xl font-bold pointer-events-none">
+                            BeyBrasil
+                          </h1>
+                          {opened && (
+                            <Group className="ml-auto" h="100%" px="md">
+                              <CloseButton
+                                onClick={toggle}
+                                hiddenFrom="sm"
+                                size="md"
+                              />
+                            </Group>
+                          )}
                         </div>
-                      )}
-                    </aside>
-                  </AppShellNavbar>
-                  <AppShellMain className="h-screen w-full">
-                    <Outlet />
-                  </AppShellMain>
-                </AppShell>
-              </SearchContextProvider>
+                        {!isLoginRoute && (
+                          <div className="ml-4 md:ml-0">
+                            <LoginButton toggleSidebar={toggle} />
+                          </div>
+                        )}
+                      </aside>
+                    </AppShellNavbar>
+                    <AppShellMain className="h-screen w-full">
+                      <Outlet />
+                      <AppShellFooter className="text-xs text-neutral-400 dark:text-neutral-500 pl-4 md:pl-(--app-shell-navbar-width) md:ml-4 py-2">
+                        <p>
+                          Website criado por{" "}
+                          <a
+                            target="_blank"
+                            rel="noreferer"
+                            href="https://instagram.com/matheusmurden"
+                            onClick={() => {
+                              track("click", {
+                                text: "@matheusmurden",
+                                location: "footer",
+                                href: "https://instagram.com/matheusmurden",
+                              });
+                            }}
+                          >
+                            @matheusmurden
+                          </a>
+                          .
+                        </p>
+                        <p>
+                          Este website não seria possível sem o apoio de{" "}
+                          <a
+                            target="_blank"
+                            rel="noreferer"
+                            href="https://instagram.com/wy.ver.n"
+                            onClick={() => {
+                              track("click", {
+                                text: "@wy.ver.n",
+                                location: "footer",
+                                href: "https://instagram.com/wy.ver.n",
+                              });
+                            }}
+                          >
+                            @wy.ver.n
+                          </a>{" "}
+                          ,{" "}
+                          <a
+                            target="_blank"
+                            rel="noreferer"
+                            href="https://instagram.com/imperadorbey"
+                            onClick={() => {
+                              track("click", {
+                                text: "@imperadorbey",
+                                location: "footer",
+                                href: "https://instagram.com/imperadorbey",
+                              });
+                            }}
+                          >
+                            @imperadorbey
+                          </a>{" "}
+                          e de todas as organizações pelo Brasil.
+                        </p>
+                      </AppShellFooter>
+                    </AppShellMain>
+                  </AppShell>
+                </SearchContextProvider>
+              </NavContextProvider>
             </ApolloContextProvider>
           </UserContextProvider>
         </MantineProvider>

@@ -1,6 +1,10 @@
 import { getRowArrValues } from "../../utils";
 import classes from "./OrgSection.module.css";
 import { SocialNetworkBadge } from "../SocialNetworkBadge";
+import manualContent from "~/assets/manualContent.json" with { type: "json" };
+import { useMemo } from "react";
+import { Button } from "@mantine/core";
+import { useNavigate } from "react-router";
 
 export interface OrgSectionProps {
   acronym: string;
@@ -16,6 +20,19 @@ export interface OrgSectionProps {
 }
 
 export const OrgSection: React.FC<OrgSectionProps> = (props) => {
+  const leagueData = useMemo(() => {
+    const data =
+      manualContent?.[
+        props.acronym.toLowerCase() as keyof typeof manualContent
+      ];
+    if (data?.["league" as keyof typeof data]) {
+      return data;
+    }
+    return undefined;
+  }, [props.acronym]);
+
+  const navigate = useNavigate();
+
   return (
     <section className={classes.OrgSection}>
       <div>
@@ -69,6 +86,14 @@ export const OrgSection: React.FC<OrgSectionProps> = (props) => {
           )}
         </div>
       </div>
+      {!!leagueData && (
+        <Button
+          className="mt-4"
+          onClick={() => navigate(`/league/${props.acronym.toLowerCase()}`)}
+        >
+          Ver Página no BeyBrasil
+        </Button>
+      )}
     </section>
   );
 };

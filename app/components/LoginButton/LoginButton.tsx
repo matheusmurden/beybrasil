@@ -9,25 +9,8 @@ import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useUserContext, type User } from "~/contexts";
 import { authUrl } from "~/startgg.client";
-import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
-
-const BasicUserQuery = gql(`
-    query BasicUserQuery {
-        currentUser {
-            id
-            images {
-                url
-                type
-            }
-            name
-            player {
-                prefix
-                gamerTag
-            }
-        }
-    }
-`);
+import { BasicUserQuery } from "~/queries";
 
 export const LoginButton = ({
   size = "sm",
@@ -80,7 +63,7 @@ export const LoginButton = ({
       <Combobox
         store={combobox}
         width="max-content"
-        position="bottom-end"
+        position="top"
         withArrow
         withinPortal={false}
       >
