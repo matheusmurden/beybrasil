@@ -29,7 +29,7 @@ export interface LeagueObj {
 }
 
 export interface EventObj {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   numEntrants?: number | null;
@@ -49,8 +49,14 @@ export enum TournamentStateEnum {
   COMPLETED = 3,
 }
 
+export interface Participant {
+  id: number;
+  gamerTag: string;
+  user: Pick<User, "id">;
+}
+
 export interface TournamentObj {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   startAt: number;
@@ -58,4 +64,22 @@ export interface TournamentObj {
   eventRegistrationClosesAt: number;
   events: EventObj[];
   state: TournamentStateEnum;
+  unpaidParticipants: {
+    pageInfo: {
+      total: number;
+    };
+    nodes: Participant[];
+  };
+  paidParticipants: {
+    pageInfo: {
+      total: number;
+    };
+    nodes: Participant[];
+  };
+  allParticipants: {
+    pageInfo: {
+      total: number;
+    };
+    nodes: Participant[];
+  };
 }

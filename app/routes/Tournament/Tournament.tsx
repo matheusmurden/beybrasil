@@ -4,6 +4,7 @@ import { redirect } from "react-router";
 import type { Route } from "./+types/Tournament";
 import { useNavContext } from "~/contexts";
 import { useEffect } from "react";
+import type { TournamentObj } from "~/types";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
@@ -26,14 +27,52 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       body: JSON.stringify({
         query: `{
           tournament(slug: "${params?.tournamentSlug}") {
+            id
             name
-            city
-            endAt
+            slug
+            startAt
+            state
             isRegistrationOpen
             eventRegistrationClosesAt
-            state
+            unpaidParticipants: participants(query: {
+              perPage: 512,
+              filter: {
+                unpaid: true
+              }
+            }) {
+              nodes {
+                gamerTag
+                user {
+                  id
+                }
+              }
+            }
+            paidParticipants: participants(query: {
+              perPage: 512,
+              filter: {
+                unpaid: false
+              }
+            }) {
+              nodes {
+                gamerTag
+                user {
+                  id
+                }
+              }
+            }
+            allParticipants: participants(query: {
+              perPage: 512,
+            }) {
+              nodes {
+                gamerTag
+                user {
+                  id
+                }
+              }
+            }
             events(limit: 20) {
               id
+              slug
               name
               numEntrants
               state
@@ -57,7 +96,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
         Authorization: `Bearer ${token}`,
       },
     });
-    const tournamentData = await response.json();
+    const tournamentData: {
+      data: {
+        tournament: TournamentObj;
+      };
+    } = await response.json();
     return {
       tournamentData: tournamentData?.data,
     };
@@ -71,6 +114,7 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
 
   useEffect(() => {
     if (loaderData?.tournamentData?.tournament?.name) {
+      console.log(loaderData?.tournamentData);
       setNavTitle(loaderData?.tournamentData?.tournament?.name);
     }
     return () => {

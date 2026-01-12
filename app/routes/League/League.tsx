@@ -48,13 +48,49 @@ export async function loader({ request, params }: Route.LoaderArgs) {
               nodes {
                 id
                 tournament {
-                id
-                name
-                slug
-                startAt
-                state
-                isRegistrationOpen
-                eventRegistrationClosesAt
+                  id
+                  name
+                  slug
+                  startAt
+                  state
+                  isRegistrationOpen
+                  eventRegistrationClosesAt
+                  unpaidParticipants: participants(query: {
+                    perPage: 512,
+                    filter: {
+                      unpaid: true
+                    }
+                  }) {
+                    nodes {
+                      gamerTag
+                      user {
+                        id
+                      }
+                    }
+                  }
+                  paidParticipants: participants(query: {
+                    perPage: 512,
+                    filter: {
+                      unpaid: false
+                    }
+                  }) {
+                    nodes {
+                      gamerTag
+                      user {
+                        id
+                      }
+                    }
+                  }
+                  allParticipants: participants(query: {
+                    perPage: 512,
+                  }) {
+                    nodes {
+                      gamerTag
+                      user {
+                        id
+                      }
+                    }
+                  }
                   events(limit: 20) {
                     id
                     slug

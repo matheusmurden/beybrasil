@@ -4,6 +4,7 @@ import classes from "./TournamentList.module.css";
 import classNames from "classnames";
 import { Button, Card, Pill, PillGroup } from "@mantine/core";
 import { useNavigate } from "react-router";
+import { useUserContext } from "~/contexts";
 
 export const TournamentList = ({
   tournaments,
@@ -13,10 +14,18 @@ export const TournamentList = ({
 }: {
   tournaments?: TournamentObj[];
   listTitle: string;
-  rankedEventIds?: string[];
+  rankedEventIds?: number[];
   isActiveEvent?: boolean;
 }) => {
   const navigate = useNavigate();
+  const { user } = useUserContext();
+  console.log({
+    test: tournaments?.[0]?.allParticipants?.nodes,
+    userId: user?.id,
+    isInArray: tournaments?.[0]?.allParticipants?.nodes
+      ?.map((i) => i?.user?.id)
+      .includes(user?.id ?? 0),
+  });
   return (
     !!tournaments &&
     tournaments?.length > 0 && (
@@ -95,15 +104,29 @@ export const TournamentList = ({
                 ))}
               </Card.Section>
               {i?.state === TournamentStateEnum.CREATED &&
-                i?.isRegistrationOpen && (
+                i?.isRegistrationOpen &&
+                !!user?.id && (
                   <Card.Section withBorder className="mb-1 p-4 pb-0">
-                    <Button
-                      size="lg"
-                      w="100%"
-                      onClick={() => navigate(`./${i?.slug}`)}
-                    >
-                      Fazer Inscrição
-                    </Button>
+                    {!i?.allParticipants?.nodes
+                      ?.map((i) => i?.user?.id)
+                      .includes(user?.id ?? 0) ? (
+                      <Button
+                        size="lg"
+                        w="100%"
+                        onClick={() => navigate(`./${i?.slug}`)}
+                      >
+                        Fazer Inscrição
+                      </Button>
+                    ) : (
+                      <Button
+                        size="lg"
+                        w="100%"
+                        color="green"
+                        className="pointer-events-none"
+                      >
+                        Inscrição Feita Com Sucesso
+                      </Button>
+                    )}
                   </Card.Section>
                 )}
             </Card>
