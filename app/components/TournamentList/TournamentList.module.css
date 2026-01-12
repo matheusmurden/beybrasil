@@ -5,28 +5,14 @@
   &:hover {
     .EventTitle {
       color: var(--accentColor);
-      font-weight: 800;
-    }
-    .EventDate {
-      color: var(--accentColor);
-      font-weight: 400;
-      font-style: oblique;
+      font-weight: 700;
     }
   }
 }
 
 .EventTitle {
-  font-weight: 500;
   transition:
     font-weight 200ms ease-in-out,
     color 50ms linear;
   will-change: font-weight font-style color;
-}
-
-.EventDate {
-  will-change: font-weight, font-style, color;
-  transition:
-    font-weight 100ms ease-in-out,
-    font-style 100ms ease-in-out,
-    color 50ms linear;
 }

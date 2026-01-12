@@ -7,10 +7,11 @@ import {
 } from "@mantine/core";
 import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { useUserContext, type User } from "~/contexts";
+import { useUserContext } from "~/contexts";
 import { authUrl } from "~/startgg.client";
 import { useQuery } from "@apollo/client/react";
 import { BasicUserQuery } from "~/queries";
+import type { User } from "~/types";
 
 export const LoginButton = ({
   size = "sm",

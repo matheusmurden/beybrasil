@@ -3,4 +3,4 @@ export * from "./SearchInput";
 export * from "./SocialNetworkBadge";
 export * from "./LoginButton";
 export * from "./AppHeader";
-export * from "./EventList";
+export * from "./TournamentList";

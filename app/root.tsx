@@ -1,6 +1,7 @@
 import "@mantine/core/styles.css";
 import "./index.css";
 import { Analytics } from "@vercel/analytics/react";
+import { track } from "@vercel/analytics";
 import type { ErrorResponse, LinksFunction } from "react-router";
 import {
   isRouteErrorResponse,
@@ -174,7 +175,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
                                 variant="subtle"
                                 size={42}
                                 visibleFrom="sm"
-                                onClick={() => navigate("/")}
+                                onClick={() => navigate(-1)}
                               >
                                 &larr;
                               </ActionIcon>

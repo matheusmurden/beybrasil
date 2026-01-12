@@ -12,7 +12,7 @@ export interface User {
   };
 }
 
-export enum ActivityState {
+export enum ActivityStateEnum {
   CREATED = "CREATED",
   ACTIVE = "ACTIVE",
   COMPLETED = "COMPLETED",
@@ -31,8 +31,9 @@ export interface LeagueObj {
 export interface EventObj {
   id: string;
   name: string;
+  slug: string;
   numEntrants?: number | null;
-  state: ActivityState;
+  state: ActivityStateEnum;
   startAt: number;
   userEntrant?: {
     standing?: {
@@ -42,9 +43,19 @@ export interface EventObj {
   tournament: TournamentObj;
 }
 
+export enum TournamentStateEnum {
+  CREATED = 1,
+  ACTIVE = 2,
+  COMPLETED = 3,
+}
+
 export interface TournamentObj {
   id: string;
+  name: string;
+  slug: string;
+  startAt: number;
   isRegistrationOpen: boolean;
   eventRegistrationClosesAt: number;
   events: EventObj[];
+  state: TournamentStateEnum;
 }
