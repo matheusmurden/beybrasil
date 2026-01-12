@@ -35,9 +35,10 @@ import {
 import type { Route } from "./+types/root";
 import { destroySession, getSession } from "./sessions.server";
 import { isAfter } from "date-fns";
-import { AppHeader, LoginButton } from "./components";
+import { AppHeader, LoadingSpinner, LoginButton } from "./components";
 import { useLocation } from "react-router";
 import { useDisclosure } from "@mantine/hooks";
+import { useNavigation } from "react-router";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -136,6 +137,8 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
     primaryShade: 6,
   });
   const navigate = useNavigate();
+  const navigation = useNavigation();
+  const isNavigating = Boolean(navigation.location);
   const location = useLocation();
   const isLoginRoute = ["/login", "/logout"].includes(location.pathname);
   const isIndexRoute = location.pathname === "/";
@@ -202,7 +205,13 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
                       </aside>
                     </AppShellNavbar>
                     <AppShellMain className="h-screen w-full">
-                      <Outlet />
+                      {isNavigating ? (
+                        <div className="h-full w-full flex items-center justify-center">
+                          <LoadingSpinner />
+                        </div>
+                      ) : (
+                        <Outlet />
+                      )}
                       <AppShellFooter className="text-xs text-neutral-400 dark:text-neutral-500 pl-4 md:pl-(--app-shell-navbar-width) md:ml-4 py-2">
                         <p>
                           Website criado por{" "}

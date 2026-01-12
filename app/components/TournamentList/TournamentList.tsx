@@ -5,27 +5,22 @@ import classNames from "classnames";
 import { Button, Card, Pill, PillGroup } from "@mantine/core";
 import { useNavigate } from "react-router";
 import { useUserContext } from "~/contexts";
+import { isUserInTournament } from "~/helpers";
+import { ptBR } from "date-fns/locale";
 
 export const TournamentList = ({
   tournaments,
   listTitle,
   rankedEventIds = [],
-  isActiveEvent = false,
+  isActive = false,
 }: {
   tournaments?: TournamentObj[];
   listTitle: string;
   rankedEventIds?: number[];
-  isActiveEvent?: boolean;
+  isActive?: boolean;
 }) => {
   const navigate = useNavigate();
   const { user } = useUserContext();
-  console.log({
-    test: tournaments?.[0]?.allParticipants?.nodes,
-    userId: user?.id,
-    isInArray: tournaments?.[0]?.allParticipants?.nodes
-      ?.map((i) => i?.user?.id)
-      .includes(user?.id ?? 0),
-  });
   return (
     !!tournaments &&
     tournaments?.length > 0 && (
@@ -40,9 +35,9 @@ export const TournamentList = ({
               className={classNames(
                 classes.EventCard,
                 {
-                  "animate-pulse": isActiveEvent,
+                  "animate-pulse": isActive,
                 },
-                "hover:border-[var(--accentColor)] border-solid border-2 rounded",
+                "hover:border-(--accentColor) border-solid border-2 rounded",
               )}
               key={i?.id}
             >
@@ -51,18 +46,46 @@ export const TournamentList = ({
                   {i?.state === TournamentStateEnum.CREATED &&
                     i?.isRegistrationOpen && (
                       <>
-                        <Pill className="bg-violet-500 text-white">
-                          <p className="text-sm">Inscrições Abertas!</p>
+                        <Pill
+                          className={classNames(" text-white", {
+                            "bg-violet-500 dark:bg-violet-700":
+                              !isUserInTournament({
+                                user,
+                                tournament: i,
+                              }),
+                            "bg-green-500 dark:bg-green-700":
+                              isUserInTournament({
+                                user,
+                                tournament: i,
+                              }),
+                          })}
+                        >
+                          <p className="text-sm">
+                            {isUserInTournament({ user, tournament: i })
+                              ? "Inscrição Confirmada"
+                              : "Inscrições Abertas"}
+                          </p>
                         </Pill>
                       </>
                     )}
                   <Pill size="md">
                     <p className="font-medium text-sm text text-gray-600 dark:text-neutral-300">
                       Data:{" "}
-                      {formatDate(
-                        new Date(i?.startAt * 1000),
-                        "dd/MM/yyyy 'às' HH:mm",
-                      )}
+                      {i?.state === TournamentStateEnum.COMPLETED
+                        ? formatDate(
+                            new Date(i?.startAt * 1000),
+                            "dd 'de' MMMM",
+                            {
+                              locale: ptBR,
+                            },
+                          )
+                        : formatDate(
+                            new Date(i?.startAt * 1000),
+                            "dd 'de' MMMM 'às' HH:mm",
+                            {
+                              locale: ptBR,
+                            },
+                          )}
                     </p>
                   </Pill>
                 </PillGroup>
@@ -71,7 +94,7 @@ export const TournamentList = ({
                 <p
                   className={classNames(
                     classes.EventTitle,
-                    "font-medium leading-normal",
+                    "font-medium text-(--accentColor) leading-normal",
                   )}
                 >
                   {i?.name}
@@ -80,21 +103,23 @@ export const TournamentList = ({
               <Card.Section withBorder className="p-4">
                 {i?.events?.map((event, eventIndex) => (
                   <div
-                    className={classNames({
+                    className={classNames("leading-none", {
                       "mb-4 last:mb-0 ": eventIndex !== i?.events?.length,
                     })}
                     key={event?.id}
                   >
-                    <p>{event?.name}</p>
-                    <Pill>
-                      <em className="leading-none text-sm text-gray-500">
-                        {rankedEventIds?.includes(event?.id)
-                          ? "Ranqueado"
-                          : "Casual"}
-                      </em>
-                    </Pill>
-                    <span className="ml-1 font-medium text-sm text text-gray-400 dark:text-neutral-300">
-                      Início:{" "}
+                    <p>
+                      {event?.name}
+                      <Pill size="xs" className="ml-1">
+                        <span className="text-xs text-gray-500">
+                          {rankedEventIds?.includes(event?.id)
+                            ? "Ranqueado"
+                            : "Casual"}
+                        </span>
+                      </Pill>
+                    </p>
+                    <span className="font-medium text-xs text text-gray-400 dark:text-neutral-300">
+                      Início{" "}
                       {formatDate(
                         new Date(event?.startAt * 1000),
                         "'às' HH:mm",
@@ -106,10 +131,8 @@ export const TournamentList = ({
               {i?.state === TournamentStateEnum.CREATED &&
                 i?.isRegistrationOpen &&
                 !!user?.id && (
-                  <Card.Section withBorder className="mb-1 p-4 pb-0">
-                    {!i?.allParticipants?.nodes
-                      ?.map((i) => i?.user?.id)
-                      .includes(user?.id ?? 0) ? (
+                  <Card.Section withBorder className="p-4">
+                    {!isUserInTournament({ user, tournament: i }) ? (
                       <Button
                         size="lg"
                         w="100%"
@@ -121,10 +144,9 @@ export const TournamentList = ({
                       <Button
                         size="lg"
                         w="100%"
-                        color="green"
-                        className="pointer-events-none"
+                        onClick={() => navigate(`./${i?.slug}`)}
                       >
-                        Inscrição Feita Com Sucesso
+                        Modificar Inscrição
                       </Button>
                     )}
                   </Card.Section>

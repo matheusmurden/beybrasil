@@ -102,7 +102,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       };
     } = await response.json();
     return {
-      tournamentData: tournamentData?.data,
+      tournament: tournamentData?.data?.tournament,
     };
   } catch (e) {
     console.log(e);
@@ -113,9 +113,9 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
   const { setNavTitle } = useNavContext();
 
   useEffect(() => {
-    if (loaderData?.tournamentData?.tournament?.name) {
-      console.log(loaderData?.tournamentData);
-      setNavTitle(loaderData?.tournamentData?.tournament?.name);
+    if (loaderData?.tournament?.name) {
+      console.log(loaderData?.tournament);
+      setNavTitle(loaderData?.tournament?.name);
     }
     return () => {
       setNavTitle("");

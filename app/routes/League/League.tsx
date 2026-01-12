@@ -174,7 +174,7 @@ export default function League({ loaderData }: Route.ComponentProps) {
           listTitle="Eventos Acontecendo AGORA"
           tournaments={loaderData?.currentTournaments}
           rankedEventIds={loaderData?.allRankedLeagueEvents}
-          isActiveEvent
+          isActive
         />
         <TournamentList
           listTitle="Próximos Eventos"
