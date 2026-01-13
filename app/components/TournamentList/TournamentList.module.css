@@ -7,6 +7,9 @@
       color: var(--accentColor);
       font-weight: 700;
     }
+    *:not(button) {
+      border-color: var(--accentColor);
+    }
   }
 }
 

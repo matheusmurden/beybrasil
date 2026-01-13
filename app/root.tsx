@@ -29,16 +29,25 @@ import {
   ColorSchemeScript,
   createTheme,
   Group,
+  List,
+  ListItem,
   MantineProvider,
   Tooltip,
 } from "@mantine/core";
 import type { Route } from "./+types/root";
 import { destroySession, getSession } from "./sessions.server";
 import { isAfter } from "date-fns";
-import { AppHeader, LoadingSpinner, LoginButton } from "./components";
+import {
+  AppHeader,
+  LeagueNavigation,
+  LoadingSpinner,
+  LoginButton,
+} from "./components";
 import { useLocation } from "react-router";
 import { useDisclosure } from "@mantine/hooks";
 import { useNavigation } from "react-router";
+import { Link } from "react-router";
+import { TZDate } from "@date-fns/tz";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -111,7 +120,13 @@ export async function loader({ request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
   const token = session.get("startgg:token");
   const tokenExpiresAt = session.get("startgg:expires");
-  if (!!tokenExpiresAt && isAfter(new Date(), new Date(tokenExpiresAt))) {
+  if (
+    !!tokenExpiresAt &&
+    isAfter(
+      new TZDate(new Date(), "America/Sao_Paulo"),
+      new TZDate(tokenExpiresAt, "America/Sao_Paulo"),
+    )
+  ) {
     try {
       session.unset("startgg:token");
       session.unset("startgg:expires");
@@ -184,9 +199,11 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
                               </ActionIcon>
                             </Tooltip>
                           )}
-                          <h1 className="ml-4 md:ml-0 md:mr-4 text-2xl font-bold pointer-events-none">
-                            BeyBrasil
-                          </h1>
+                          <Link to="/">
+                            <h1 className="ml-4 md:ml-0 md:mr-4 text-2xl font-bold pointer-events-none">
+                              BeyBrasil
+                            </h1>
+                          </Link>
                           {opened && (
                             <Group className="ml-auto" h="100%" px="md">
                               <CloseButton
@@ -197,11 +214,14 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
                             </Group>
                           )}
                         </div>
-                        {!isLoginRoute && (
-                          <div className="ml-4 md:ml-0">
-                            <LoginButton toggleSidebar={toggle} />
-                          </div>
-                        )}
+                        <div>
+                          <LeagueNavigation toggleSidebar={toggle} />
+                          {!isLoginRoute && (
+                            <div className="ml-4 md:ml-0">
+                              <LoginButton toggleSidebar={toggle} />
+                            </div>
+                          )}
+                        </div>
                       </aside>
                     </AppShellNavbar>
                     <AppShellMain className="h-screen w-full">
@@ -212,7 +232,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
                       ) : (
                         <Outlet />
                       )}
-                      <AppShellFooter className="text-xs text-neutral-400 dark:text-neutral-500 pl-4 md:pl-(--app-shell-navbar-width) md:ml-4 py-2">
+                      <AppShellFooter className="hidden md:block text-xs text-neutral-400 dark:text-neutral-500 pl-4 md:pl-(--app-shell-navbar-width) md:ml-4 py-2">
                         <p>
                           Website criado por{" "}
                           <a

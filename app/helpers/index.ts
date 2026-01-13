@@ -1,16 +1,27 @@
-import type { TournamentObj, User } from "~/types";
+import type { EventObj, TournamentObj } from "~/types";
 
 export const isUserInTournament = ({
-  user,
+  userId,
   tournament,
 }: {
-  user?: User;
+  userId?: number;
   tournament: TournamentObj;
 }) => {
   return (
-    !!user?.id &&
-    tournament?.allParticipants?.nodes
-      ?.map((i) => i?.user?.id)
-      .includes(user?.id)
+    !!userId &&
+    tournament?.allParticipants?.nodes?.map((i) => i?.user?.id).includes(userId)
   );
+};
+
+export const isUserInEvent = ({
+  userId,
+  event,
+}: {
+  userId?: number;
+  event: EventObj;
+}) => {
+  const userIdsInEvent = event?.entrants?.nodes?.flatMap((node) =>
+    node?.participants?.flatMap((i) => i?.user?.id),
+  );
+  return !!userId && userIdsInEvent?.includes(userId);
 };

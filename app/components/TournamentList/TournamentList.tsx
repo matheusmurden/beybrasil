@@ -7,6 +7,7 @@ import { useNavigate } from "react-router";
 import { useUserContext } from "~/contexts";
 import { isUserInTournament } from "~/helpers";
 import { ptBR } from "date-fns/locale";
+import { TZDate } from "@date-fns/tz";
 
 export const TournamentList = ({
   tournaments,
@@ -50,37 +51,40 @@ export const TournamentList = ({
                           className={classNames(" text-white", {
                             "bg-violet-500 dark:bg-violet-700":
                               !isUserInTournament({
-                                user,
+                                userId: user?.id ?? 0,
                                 tournament: i,
                               }),
                             "bg-green-500 dark:bg-green-700":
                               isUserInTournament({
-                                user,
+                                userId: user?.id ?? 0,
                                 tournament: i,
                               }),
                           })}
                         >
                           <p className="text-sm">
-                            {isUserInTournament({ user, tournament: i })
+                            {isUserInTournament({
+                              userId: user?.id ?? 0,
+                              tournament: i,
+                            })
                               ? "Inscrição Confirmada"
                               : "Inscrições Abertas"}
                           </p>
                         </Pill>
                       </>
                     )}
-                  <Pill size="md">
-                    <p className="font-medium text-sm text text-gray-600 dark:text-neutral-300">
+                  <Pill size="md" className="dark:bg-neutral-600">
+                    <p className="font-medium text-sm text text-gray-600 dark:text-neutral-200">
                       Data:{" "}
                       {i?.state === TournamentStateEnum.COMPLETED
                         ? formatDate(
-                            new Date(i?.startAt * 1000),
+                            new TZDate(i?.startAt * 1000, "America/Sao_Paulo"),
                             "dd 'de' MMMM",
                             {
                               locale: ptBR,
                             },
                           )
                         : formatDate(
-                            new Date(i?.startAt * 1000),
+                            new TZDate(i?.startAt * 1000, "America/Sao_Paulo"),
                             "dd 'de' MMMM 'às' HH:mm",
                             {
                               locale: ptBR,
@@ -94,7 +98,7 @@ export const TournamentList = ({
                 <p
                   className={classNames(
                     classes.EventTitle,
-                    "font-medium text-(--accentColor) leading-normal",
+                    "font-medium leading-normal",
                   )}
                 >
                   {i?.name}
@@ -110,21 +114,26 @@ export const TournamentList = ({
                   >
                     <p>
                       {event?.name}
-                      <Pill size="xs" className="ml-1">
-                        <span className="text-xs text-gray-500">
+                      <Pill size="xs" className="ml-1 dark:bg-neutral-600">
+                        <span className="text-xs text-gray-500 dark:text-neutral-200">
                           {rankedEventIds?.includes(event?.id)
                             ? "Ranqueado"
                             : "Casual"}
                         </span>
                       </Pill>
                     </p>
-                    <span className="font-medium text-xs text text-gray-400 dark:text-neutral-300">
-                      Início{" "}
-                      {formatDate(
-                        new Date(event?.startAt * 1000),
-                        "'às' HH:mm",
-                      )}
-                    </span>
+                    {i?.state !== TournamentStateEnum.COMPLETED && (
+                      <span className="font-medium text-xs text text-gray-400 dark:text-neutral-300">
+                        Início{" "}
+                        {formatDate(
+                          new TZDate(
+                            event?.startAt * 1000,
+                            "America/Sao_Paulo",
+                          ),
+                          "'às' HH:mm",
+                        )}
+                      </span>
+                    )}
                   </div>
                 ))}
               </Card.Section>
@@ -132,25 +141,54 @@ export const TournamentList = ({
                 i?.isRegistrationOpen &&
                 !!user?.id && (
                   <Card.Section withBorder className="p-4">
-                    {!isUserInTournament({ user, tournament: i }) ? (
+                    {!isUserInTournament({
+                      userId: user?.id ?? 0,
+                      tournament: i,
+                    }) ? (
                       <Button
+                        component="a"
+                        target="_blank"
+                        rel="no-referrer"
+                        href={`https://www.start.gg/${i?.slug}/register`}
                         size="lg"
                         w="100%"
-                        onClick={() => navigate(`./${i?.slug}`)}
                       >
                         Fazer Inscrição
                       </Button>
                     ) : (
                       <Button
+                        component="a"
+                        target="_blank"
+                        rel="no-referrer"
+                        href={`https://www.start.gg/${i?.slug}/dashboard`}
+                        variant="outline"
                         size="lg"
                         w="100%"
-                        onClick={() => navigate(`./${i?.slug}`)}
                       >
                         Modificar Inscrição
                       </Button>
                     )}
                   </Card.Section>
                 )}
+
+              {[
+                TournamentStateEnum.COMPLETED,
+                TournamentStateEnum.ACTIVE,
+              ].includes(i?.state) && (
+                <Card.Section withBorder className="p-4">
+                  <Button
+                    onClick={() => navigate(`./${i?.slug}`)}
+                    color="green"
+                    variant="outline"
+                    size="lg"
+                    w="100%"
+                  >
+                    {i?.state === TournamentStateEnum.COMPLETED
+                      ? "Ver Resultados"
+                      : "Acompanhar Ao Vivo"}
+                  </Button>
+                </Card.Section>
+              )}
             </Card>
           ))}
         </ul>

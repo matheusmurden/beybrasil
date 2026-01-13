@@ -43,10 +43,20 @@ export const AppHeader = ({
           </ActionIcon>
         </Tooltip>
       )}
-      {!!navTitle && <h1 className="text-3xl">{navTitle}</h1>}
+      {!!navTitle && (
+        <h1 className="text-lg md:text-2xl max-w-full overflow-hidden text-ellipsis">
+          {navTitle}
+        </h1>
+      )}
 
       <Group h="100%" px="md">
-        <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+        <Burger
+          color="violet"
+          opened={opened}
+          onClick={toggle}
+          hiddenFrom="sm"
+          size="sm"
+        />
       </Group>
       <SearchInput />
     </AppShellHeader>

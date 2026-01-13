@@ -11,6 +11,7 @@ import {
 } from "~/types";
 import { useEffect } from "react";
 import { useNavContext } from "~/contexts";
+import { Outlet } from "react-router";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
@@ -98,12 +99,17 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     numEntrants
                     state
                     startAt
+                    entryFee
+                    prizingInfo
+                    rulesMarkdown
                     images {
                       id
                       url
                       type
                     }
                     userEntrant {
+                      id
+                      name
                       standing {
                         placement
                       }
@@ -154,7 +160,13 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 }
 
 export default function League({ loaderData }: Route.ComponentProps) {
-  const league: LeagueObj | undefined = loaderData?.league;
+  const {
+    league,
+    currentTournaments,
+    upcomingTournaments,
+    pastTournaments,
+    allRankedLeagueEvents,
+  } = loaderData ?? {};
 
   const { setNavTitle } = useNavContext();
 
@@ -172,21 +184,22 @@ export default function League({ loaderData }: Route.ComponentProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 place-items-center md:place-items-start gap-y-12">
         <TournamentList
           listTitle="Eventos Acontecendo AGORA"
-          tournaments={loaderData?.currentTournaments}
-          rankedEventIds={loaderData?.allRankedLeagueEvents}
+          tournaments={currentTournaments}
+          rankedEventIds={allRankedLeagueEvents}
           isActive
         />
         <TournamentList
           listTitle="Próximos Eventos"
-          tournaments={loaderData?.upcomingTournaments}
-          rankedEventIds={loaderData?.allRankedLeagueEvents}
+          tournaments={upcomingTournaments}
+          rankedEventIds={allRankedLeagueEvents}
         />
         <TournamentList
           listTitle="Eventos Passados"
-          tournaments={loaderData?.pastTournaments}
-          rankedEventIds={loaderData?.allRankedLeagueEvents}
+          tournaments={pastTournaments}
+          rankedEventIds={allRankedLeagueEvents}
         />
       </div>
+      <Outlet context={{ league, allRankedLeagueEvents }} />
     </div>
   );
 }

@@ -75,7 +75,7 @@ body {
 
 @media (max-width: 819px) {
   body {
-    padding: 0 2rem 0 2rem;
+    padding: 0 2rem 0 2rem !important;
   }
   header h1 {
     font-size: 2.4rem;
@@ -83,7 +83,7 @@ body {
 }
 @media (min-width: 820px) {
   body {
-    padding: 0 3rem 0 3rem;
+    padding: 0 3rem 0 3rem !important;
   }
   header h1 {
     font-size: 2.8rem;
@@ -91,7 +91,7 @@ body {
 }
 @media (min-width: 1280px) {
   body {
-    padding: 0 6rem 0 6rem;
+    padding: 0 6rem 0 6rem !important;
   }
   header h1 {
     font-size: 3.2rem;

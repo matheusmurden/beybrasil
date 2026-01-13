@@ -1,0 +1,14 @@
+.Modal {
+  section {
+    min-width: 50vw;
+    > div {
+      padding: 0;
+    }
+    @media screen and (max-width: 960px) {
+      min-width: 95vw;
+    }
+  }
+  > div:not([data-fixed="true"]) {
+    left: 0;
+  }
+}
