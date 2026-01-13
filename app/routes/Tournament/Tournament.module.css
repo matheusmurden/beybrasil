@@ -1,0 +1,31 @@
+@reference "tailwindcss";
+
+.Modal {
+  section {
+    min-width: 50vw;
+    > div {
+      padding: 0;
+    }
+    @media screen and (max-width: 960px) {
+      min-width: 95vw;
+    }
+  }
+  > div:not([data-fixed="true"]) {
+    left: 0;
+  }
+}
+
+.Checkbox {
+  input,
+  label {
+    cursor: pointer;
+  }
+  &.Required {
+    label:after {
+      @apply text-xs;
+      margin-left: 0.2rem;
+      content: "* (Obrigatório)";
+      color: red;
+    }
+  }
+}

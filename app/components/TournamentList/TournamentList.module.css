@@ -1,0 +1,21 @@
+.EventCard {
+  @media (prefers-color-scheme: dark) {
+    background-color: var(--mantine-color-dark-filled);
+  }
+  &:hover {
+    .EventTitle {
+      color: var(--accentColor);
+      font-weight: 700;
+    }
+    *:not(button) {
+      border-color: var(--accentColor);
+    }
+  }
+}
+
+.EventTitle {
+  transition:
+    font-weight 200ms ease-in-out,
+    color 50ms linear;
+  will-change: font-weight font-style color;
+}

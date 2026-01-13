@@ -7,19 +7,7 @@ import {
   type PropsWithChildren,
   type SetStateAction,
 } from "react";
-
-export interface User {
-  id: number;
-  name: string;
-  images: {
-    type: string;
-    url: string;
-  }[];
-  player?: {
-    prefix?: string;
-    gamerTag: string;
-  };
-}
+import type { User } from "~/types";
 
 interface UserContextProps {
   user?: User;

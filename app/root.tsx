@@ -1,6 +1,7 @@
 import "@mantine/core/styles.css";
 import "./index.css";
 import { Analytics } from "@vercel/analytics/react";
+import { track } from "@vercel/analytics";
 import type { ErrorResponse, LinksFunction } from "react-router";
 import {
   isRouteErrorResponse,
@@ -16,27 +17,37 @@ import {
   UserContextProvider,
   SearchContextProvider,
   ApolloContextProvider,
+  NavContextProvider,
 } from "./contexts";
 import {
   ActionIcon,
   AppShell,
-  AppShellHeader,
+  AppShellFooter,
   AppShellMain,
   AppShellNavbar,
-  Burger,
   CloseButton,
   ColorSchemeScript,
   createTheme,
   Group,
+  List,
+  ListItem,
   MantineProvider,
   Tooltip,
 } from "@mantine/core";
 import type { Route } from "./+types/root";
 import { destroySession, getSession } from "./sessions.server";
 import { isAfter } from "date-fns";
-import { LoginButton, SearchInput } from "./components";
+import {
+  AppHeader,
+  LeagueNavigation,
+  LoadingSpinner,
+  LoginButton,
+} from "./components";
 import { useLocation } from "react-router";
 import { useDisclosure } from "@mantine/hooks";
+import { useNavigation } from "react-router";
+import { Link } from "react-router";
+import { TZDate } from "@date-fns/tz";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -109,7 +120,13 @@ export async function loader({ request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
   const token = session.get("startgg:token");
   const tokenExpiresAt = session.get("startgg:expires");
-  if (!!tokenExpiresAt && isAfter(new Date(), new Date(tokenExpiresAt))) {
+  if (
+    !!tokenExpiresAt &&
+    isAfter(
+      new TZDate(new Date(), "America/Sao_Paulo"),
+      new TZDate(tokenExpiresAt, "America/Sao_Paulo"),
+    )
+  ) {
     try {
       session.unset("startgg:token");
       session.unset("startgg:expires");
@@ -135,6 +152,8 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
     primaryShade: 6,
   });
   const navigate = useNavigate();
+  const navigation = useNavigation();
+  const isNavigating = Boolean(navigation.location);
   const location = useLocation();
   const isLoginRoute = ["/login", "/logout"].includes(location.pathname);
   const isIndexRoute = location.pathname === "/";
@@ -153,83 +172,123 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
           <Analytics />
           <UserContextProvider>
             <ApolloContextProvider token={loaderData?.token}>
-              <SearchContextProvider>
-                <AppShell
-                  className="w-full h-screen"
-                  navbar={{
-                    width: 300,
-                    breakpoint: "sm",
-                    collapsed: { mobile: !opened },
-                  }}
-                >
-                  <AppShellHeader
-                    withBorder={false}
-                    className="flex px-4 py-2 min-h-20 justify-between items-center pl-4 md:pl-(--app-shell-navbar-width)"
+              <NavContextProvider>
+                <SearchContextProvider>
+                  <AppShell
+                    className="w-full h-screen"
+                    navbar={{
+                      width: 300,
+                      breakpoint: "sm",
+                      collapsed: { mobile: !opened },
+                    }}
                   >
-                    {!isIndexRoute && (
-                      <Tooltip label="Voltar">
-                        <ActionIcon
-                          variant="subtle"
-                          size={42}
-                          hiddenFrom="sm"
-                          color="dark"
-                          onClick={() => navigate("/")}
-                        >
-                          &larr;
-                        </ActionIcon>
-                      </Tooltip>
-                    )}
-                    <Group h="100%" px="md">
-                      <Burger
-                        opened={opened}
-                        onClick={toggle}
-                        hiddenFrom="sm"
-                        size="sm"
-                      />
-                    </Group>
-                    <SearchInput />
-                  </AppShellHeader>
-                  <AppShellNavbar>
-                    <aside className="w-full h-full flex flex-col px-4 py-6 justify-between">
-                      <div className="flex min-h-12 w-full justify-between items-center">
-                        {!isIndexRoute && (
-                          <Tooltip label="Voltar">
-                            <ActionIcon
-                              variant="subtle"
-                              size={42}
-                              visibleFrom="sm"
-                              color="dark"
-                              onClick={() => navigate("/")}
-                            >
-                              &larr;
-                            </ActionIcon>
-                          </Tooltip>
-                        )}
-                        <h1 className="ml-4 md:ml-0 md:mr-4 text-2xl font-bold pointer-events-none">
-                          BeyBrasil
-                        </h1>
-                        {opened && (
-                          <Group className="ml-auto" h="100%" px="md">
-                            <CloseButton
-                              onClick={toggle}
-                              hiddenFrom="sm"
-                              size="md"
-                            />
-                          </Group>
-                        )}
-                      </div>
-                      {!isLoginRoute && (
-                        <div className="ml-4 md:ml-0">
-                          <LoginButton toggleSidebar={toggle} />
+                    <AppHeader opened={opened} toggle={toggle} />
+
+                    <AppShellNavbar>
+                      <aside className="w-full h-full flex flex-col px-4 py-6 justify-between">
+                        <div className="flex min-h-12 w-full justify-between items-center">
+                          {!isIndexRoute && (
+                            <Tooltip label="Voltar">
+                              <ActionIcon
+                                variant="subtle"
+                                size={42}
+                                visibleFrom="sm"
+                                onClick={() => navigate(-1)}
+                              >
+                                &larr;
+                              </ActionIcon>
+                            </Tooltip>
+                          )}
+                          <Link to="/">
+                            <h1 className="ml-4 md:ml-0 md:mr-4 text-2xl font-bold pointer-events-none">
+                              BeyBrasil
+                            </h1>
+                          </Link>
+                          {opened && (
+                            <Group className="ml-auto" h="100%" px="md">
+                              <CloseButton
+                                onClick={toggle}
+                                hiddenFrom="sm"
+                                size="md"
+                              />
+                            </Group>
+                          )}
                         </div>
+                        <div>
+                          <LeagueNavigation toggleSidebar={toggle} />
+                          {!isLoginRoute && (
+                            <div className="ml-4 md:ml-0">
+                              <LoginButton toggleSidebar={toggle} />
+                            </div>
+                          )}
+                        </div>
+                      </aside>
+                    </AppShellNavbar>
+                    <AppShellMain className="h-screen w-full">
+                      {isNavigating ? (
+                        <div className="h-full w-full flex items-center justify-center">
+                          <LoadingSpinner />
+                        </div>
+                      ) : (
+                        <Outlet />
                       )}
-                    </aside>
-                  </AppShellNavbar>
-                  <AppShellMain className="h-screen w-full">
-                    <Outlet />
-                  </AppShellMain>
-                </AppShell>
-              </SearchContextProvider>
+                      <AppShellFooter className="hidden md:block text-xs text-neutral-400 dark:text-neutral-500 pl-4 md:pl-(--app-shell-navbar-width) md:ml-4 py-2">
+                        <p>
+                          Website criado por{" "}
+                          <a
+                            target="_blank"
+                            rel="noreferer"
+                            href="https://instagram.com/matheusmurden"
+                            onClick={() => {
+                              track("click", {
+                                text: "@matheusmurden",
+                                location: "footer",
+                                href: "https://instagram.com/matheusmurden",
+                              });
+                            }}
+                          >
+                            @matheusmurden
+                          </a>
+                          .
+                        </p>
+                        <p>
+                          Este website não seria possível sem o apoio de{" "}
+                          <a
+                            target="_blank"
+                            rel="noreferer"
+                            href="https://instagram.com/wy.ver.n"
+                            onClick={() => {
+                              track("click", {
+                                text: "@wy.ver.n",
+                                location: "footer",
+                                href: "https://instagram.com/wy.ver.n",
+                              });
+                            }}
+                          >
+                            @wy.ver.n
+                          </a>{" "}
+                          ,{" "}
+                          <a
+                            target="_blank"
+                            rel="noreferer"
+                            href="https://instagram.com/imperadorbey"
+                            onClick={() => {
+                              track("click", {
+                                text: "@imperadorbey",
+                                location: "footer",
+                                href: "https://instagram.com/imperadorbey",
+                              });
+                            }}
+                          >
+                            @imperadorbey
+                          </a>{" "}
+                          e de todas as organizações pelo Brasil.
+                        </p>
+                      </AppShellFooter>
+                    </AppShellMain>
+                  </AppShell>
+                </SearchContextProvider>
+              </NavContextProvider>
             </ApolloContextProvider>
           </UserContextProvider>
         </MantineProvider>
