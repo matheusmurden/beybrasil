@@ -15,9 +15,11 @@ export const LeagueNavigation = ({
   return (
     leagueAcronym && (
       <List className="pl-6 md:pl-2 mb-12">
-        <h2 className="text-lg font-semibold mb-2">
-          Menu da Liga - {leagueAcronym?.toUpperCase()}
-        </h2>
+        <ListItem>
+          <h2 className="text-lg font-semibold mb-2">
+            Menu da Liga - {leagueAcronym?.toUpperCase()}
+          </h2>
+        </ListItem>
         <ListItem
           className={classNames(
             "hover:text-violet-500 dark:hover:text-violet-300 mb-1",

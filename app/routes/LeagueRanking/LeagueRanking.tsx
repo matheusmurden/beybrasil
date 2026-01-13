@@ -1,5 +1,5 @@
 import { getSession } from "~/sessions.server";
-import manualContent from "~/assets/manualContent.json";
+import manualContent from "~/assets/manualContent.json" with { type: "json" };
 import { redirect } from "react-router";
 import type { LeagueObj, Standing } from "~/types";
 import type { Route } from "./+types/LeagueRanking";
