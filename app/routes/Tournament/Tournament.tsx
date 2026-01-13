@@ -8,6 +8,7 @@ import {
   TournamentStateEnum,
   type EventObj,
   type LeagueObj,
+  type Standing,
   type TournamentObj,
 } from "~/types";
 import { Form } from "react-router";
@@ -31,6 +32,7 @@ import { Table } from "@mantine/core";
 
 import { TZDate } from "@date-fns/tz";
 import { useColorScheme } from "@mantine/hooks";
+import { RANKING_POINTS_BY_PLACEMENT } from "~/consts";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
@@ -165,6 +167,18 @@ export async function loader({ request, params }: Route.LoaderArgs) {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    const leagueResponse = await fetch("https://api.start.gg/gql/alpha", {
+      method: "POST",
+      body: JSON.stringify({
+        query: ``,
+      }),
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
     const tournamentData: {
       data: {
         tournament: TournamentObj;
@@ -236,9 +250,10 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useUserContext();
-  const { league, allRankedLeagueEvents } = useOutletContext<{
+  const { league, allRankedLeagueEvents, ranking } = useOutletContext<{
     league: LeagueObj;
     allRankedLeagueEvents: number[];
+    ranking: Standing[];
   }>();
 
   const tournament = loaderData?.tournament;
@@ -282,7 +297,7 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
     return indexA - indexB; // Both in idOrder, sort by their index
   };
 
-  const value = useColorScheme();
+  const colorScheme = useColorScheme();
   return (
     <Modal
       className={classes.Modal}
@@ -350,7 +365,7 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                   <Table
                     highlightOnHover
                     highlightOnHoverColor={
-                      value === "dark" ? "dark" : undefined
+                      colorScheme === "dark" ? "dark" : undefined
                     }
                   >
                     <Table.Thead>
@@ -359,6 +374,19 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                         <Table.Th>Blader</Table.Th>
                         <Table.Th className="text-center">Vitórias</Table.Th>
                         <Table.Th className="text-center">Derrotas</Table.Th>
+                        {allRankedLeagueEvents?.includes(event?.id) && (
+                          <>
+                            <Table.Th className="text-center">
+                              Ganhou Pontos Ranqueados
+                            </Table.Th>
+                            <Table.Th className="text-center">
+                              Pontuação Ranqueada Atual
+                            </Table.Th>
+                            <Table.Th className="text-center">
+                              Posicão Atual no Ranking
+                            </Table.Th>
+                          </>
+                        )}
                       </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
@@ -395,6 +423,39 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                           <Table.Td className="text-center">
                             {standing.setRecordWithoutByes?.losses}
                           </Table.Td>
+                          {allRankedLeagueEvents?.includes(event?.id) && (
+                            <>
+                              <Table.Td className="text-center">
+                                {RANKING_POINTS_BY_PLACEMENT?.[
+                                  standing?.placement
+                                ] > 0
+                                  ? `+${
+                                      RANKING_POINTS_BY_PLACEMENT?.[
+                                        standing?.placement
+                                      ]
+                                    }`
+                                  : 0}
+                              </Table.Td>
+                              <Table.Td className="text-center">
+                                {
+                                  ranking?.find(
+                                    (i) =>
+                                      i?.player?.user?.id ===
+                                      standing?.player?.user?.id,
+                                  )?.totalPoints
+                                }
+                              </Table.Td>
+                              <Table.Td className="text-center">
+                                {
+                                  ranking?.find(
+                                    (i) =>
+                                      i?.player?.user?.id ===
+                                      standing?.player?.user?.id,
+                                  )?.placement
+                                }
+                              </Table.Td>
+                            </>
+                          )}
                         </Table.Tr>
                       ))}
                     </Table.Tbody>

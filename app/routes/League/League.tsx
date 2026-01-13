@@ -45,6 +45,27 @@ export async function loader({ request, params }: Route.LoaderArgs) {
             city
             endAt
             entrantCount
+            standings(query: { perPage: 100 }) {
+              nodes {
+                id
+                placement
+                totalPoints
+                metadata
+                player {
+                  id
+                  gamerTag
+                  prefix
+                  user {
+                    id
+                    images(type: "profile") {
+                      id
+                      url
+                      type
+                    }
+                  }
+                }
+              }
+            }
             events(query: { perPage: 20 }) {
               nodes {
                 id
@@ -130,6 +151,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
     const league: LeagueObj = leagueData?.data?.league;
 
+    const ranking = league?.standings?.nodes;
+
     const allRankedLeagueEvents = league?.events?.nodes?.flatMap(
       (event) => event.id,
     );
@@ -153,6 +176,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       upcomingTournaments,
       pastTournaments,
       currentTournaments,
+      ranking,
     };
   } catch (e) {
     console.log(e);
@@ -166,6 +190,7 @@ export default function League({ loaderData }: Route.ComponentProps) {
     upcomingTournaments,
     pastTournaments,
     allRankedLeagueEvents,
+    ranking,
   } = loaderData ?? {};
 
   const { setNavTitle } = useNavContext();
@@ -199,7 +224,7 @@ export default function League({ loaderData }: Route.ComponentProps) {
           rankedEventIds={allRankedLeagueEvents}
         />
       </div>
-      <Outlet context={{ league, allRankedLeagueEvents }} />
+      <Outlet context={{ league, allRankedLeagueEvents, ranking }} />
     </div>
   );
 }

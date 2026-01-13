@@ -106,12 +106,14 @@ export interface Participant {
   id: number;
   gamerTag: string;
   user: Pick<User, "id">;
+  entrants?: Entrant[];
 }
 
 export interface Entrant {
   id: number;
   name: string;
   participants: Participant[];
+  standing?: Standing;
 }
 
 export interface TournamentObj {
@@ -123,22 +125,16 @@ export interface TournamentObj {
   eventRegistrationClosesAt: number;
   events: EventObj[];
   state: TournamentStateEnum;
+  participants: {
+    nodes: Participant[];
+  };
   unpaidParticipants: {
-    pageInfo: {
-      total: number;
-    };
     nodes: Participant[];
   };
   paidParticipants: {
-    pageInfo: {
-      total: number;
-    };
     nodes: Participant[];
   };
   allParticipants: {
-    pageInfo: {
-      total: number;
-    };
     nodes: Participant[];
   };
 }

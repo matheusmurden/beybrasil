@@ -44,6 +44,16 @@ export const TournamentList = ({
             >
               <Card.Section className="pt-5 pb-0 px-3 mb-2">
                 <PillGroup className="flex flex-col flex-1 items-start">
+                  {i?.state === TournamentStateEnum.ACTIVE && (
+                    <Pill className=" text-white bg-green-500 dark:bg-green-700">
+                      <p className="text-sm">Acontecendo Agora</p>
+                    </Pill>
+                  )}
+                  {i?.state === TournamentStateEnum.COMPLETED && (
+                    <Pill className=" text-white bg-green-500 dark:bg-green-700">
+                      <p className="text-sm">Evento Concluído</p>
+                    </Pill>
+                  )}
                   {i?.state === TournamentStateEnum.CREATED &&
                     i?.isRegistrationOpen && (
                       <>

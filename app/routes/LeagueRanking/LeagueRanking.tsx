@@ -6,6 +6,7 @@ import type { Route } from "./+types/LeagueRanking";
 import { Avatar, Modal, Table } from "@mantine/core";
 import { useNavigate } from "react-router";
 import classes from "./LeagueRanking.module.css";
+import { useColorScheme } from "@mantine/hooks";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
@@ -39,6 +40,53 @@ export async function loader({ request, params }: Route.LoaderArgs) {
             city
             endAt
             entrantCount
+            events {
+              nodes {
+                id
+                tournament {
+                  id
+                  participants(query: { perPage: 100 }) {
+                    nodes {
+                      id
+                      gamerTag
+                      user {
+                        id
+                      }
+                      entrants {
+                        id
+                        standing {
+                          id
+                          placement
+                          isFinal
+                        }
+                      }
+                    }
+                  }
+                  events(limit: 20) {
+                    id
+                    entrants {
+                      nodes {
+                        id
+                        standing {
+                          placement
+                        }
+                        participants {
+                          id
+                          user {
+                            id
+                          }
+                          entrants {
+                            standing {
+                              placement
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
             standings(query: { perPage: 100 }) {
               nodes {
                 id
@@ -74,9 +122,78 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
     const ranking: Standing[] = league?.standings?.nodes;
 
+    const allRankedLeagueEvents = league?.events?.nodes?.flatMap(
+      (event) => event.id,
+    );
+
+    const tournamentsParticipants = league?.events?.nodes?.flatMap(
+      (tournamentNode) =>
+        tournamentNode?.tournament?.participants?.nodes
+          ?.flatMap((i) => ({
+            tournamentId: tournamentNode?.tournament?.id,
+            userId: i?.user?.id,
+          }))
+          ?.filter((i) => !!i?.userId),
+    );
+
+    const tournamentCounts = tournamentsParticipants.reduce(
+      (acc: Record<number, Set<number>>, { userId, tournamentId }) => {
+        acc[userId] ??= new Set<number>();
+        acc[userId].add(tournamentId);
+        return acc;
+      },
+      {},
+    );
+
+    const numberOfRankedPodiumsByUser = league?.events?.nodes?.flatMap(
+      (rankedEventNode) =>
+        rankedEventNode?.tournament?.events?.flatMap((eventNode) =>
+          eventNode?.entrants?.nodes
+            ?.flatMap((entrantNode) =>
+              entrantNode?.participants?.flatMap((participantNode) => ({
+                rankedEventId: rankedEventNode.id,
+                eventId: eventNode?.id,
+                isPodium: Boolean((entrantNode?.standing?.placement ?? 4) < 4),
+                userId: participantNode?.user?.id,
+              })),
+            )
+            ?.filter((i) => allRankedLeagueEvents?.includes(i?.eventId))
+            ?.filter((i) => i?.isPodium),
+        ),
+    );
+
+    const numberOfRankedVictoriesByUser = league?.events?.nodes?.flatMap(
+      (rankedEventNode) =>
+        rankedEventNode?.tournament?.events?.flatMap((eventNode) =>
+          eventNode?.entrants?.nodes
+            ?.flatMap((entrantNode) =>
+              entrantNode?.participants?.flatMap((participantNode) => ({
+                rankedEventId: rankedEventNode.id,
+                eventId: eventNode?.id,
+                isVictory: Boolean(
+                  (entrantNode?.standing?.placement ?? 0) === 1,
+                ),
+                userId: participantNode?.user?.id,
+              })),
+            )
+            ?.filter((i) => allRankedLeagueEvents?.includes(i?.eventId))
+            ?.filter((i) => i?.isVictory),
+        ),
+    );
+
+    const userTournamentCounts = Object.entries(tournamentCounts).map(
+      ([userId, tournaments]) => ({
+        userId: Number(userId),
+        tournamentsCount: tournaments.size,
+      }),
+    );
+
     return {
       ranking,
       league,
+      userTournamentCounts,
+      numberOfRankedPodiumsByUser,
+      numberOfRankedVictoriesByUser,
     };
   } catch (e) {
     console.log(e);
@@ -85,6 +202,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 export default function LeagueRanking({ loaderData }: Route.ComponentProps) {
   const navigate = useNavigate();
+  const colorScheme = useColorScheme();
+
   if (!loaderData?.ranking?.length) {
     return (
       <Modal
@@ -116,14 +235,21 @@ export default function LeagueRanking({ loaderData }: Route.ComponentProps) {
         opened
         onClose={() => navigate(location.pathname.split("/ranking")[0])}
       >
-        <Table>
+        <Table
+          highlightOnHover
+          highlightOnHoverColor={colorScheme === "dark" ? "dark" : undefined}
+        >
           <Table.Thead>
             <Table.Tr>
               <Table.Th className="text-center">Posição</Table.Th>
               <Table.Th>Blader</Table.Th>
               <Table.Th className="text-center">Pontuação Atual</Table.Th>
               <Table.Th className="text-center">
-                Qtd de Torneios Participados
+                Participação em Torneios
+              </Table.Th>
+              <Table.Th className="text-center">Pódios Ranqueados</Table.Th>
+              <Table.Th className="text-center">
+                Campeã(o) em Eventos Ranqueados
               </Table.Th>
             </Table.Tr>
           </Table.Thead>
@@ -159,9 +285,21 @@ export default function LeagueRanking({ loaderData }: Route.ComponentProps) {
                   {standing.totalPoints}
                 </Table.Td>
                 <Table.Td className="text-center">
+                  {loaderData?.userTournamentCounts?.find(
+                    (i) => i?.userId === standing?.player?.user?.id,
+                  )?.tournamentsCount ?? 0}
+                </Table.Td>
+                <Table.Td className="text-center">
                   {
-                    Object.values(standing.metadata?.pointContributions)?.map(
-                      (i) => i?.doesContribute === true,
+                    loaderData?.numberOfRankedPodiumsByUser?.filter(
+                      (i) => i?.userId === standing?.player?.user?.id,
+                    )?.length
+                  }
+                </Table.Td>
+                <Table.Td className="text-center">
+                  {
+                    loaderData?.numberOfRankedVictoriesByUser?.filter(
+                      (i) => i?.userId === standing?.player?.user?.id,
                     )?.length
                   }
                 </Table.Td>
