@@ -5,13 +5,13 @@ import {
   useCombobox,
   type ButtonProps,
 } from "@mantine/core";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useUserContext } from "~/contexts";
 import { authUrl } from "~/startgg.client";
-import { useQuery } from "@apollo/client/react";
-import { BasicUserQuery } from "~/queries";
 import type { User } from "~/types";
+import { useFetcher } from "react-router";
+import type { loader } from "~/routes/api/User";
 
 export const LoginButton = ({
   size = "sm",
@@ -22,9 +22,7 @@ export const LoginButton = ({
 }) => {
   const { user, setUser } = useUserContext();
 
-  const { data } = useQuery<{ currentUser: User }>(BasicUserQuery, {
-    skip: Boolean(user?.id),
-  });
+  const fetcher = useFetcher<typeof loader>();
 
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
@@ -53,11 +51,18 @@ export const LoginButton = ({
     return img;
   }, [user]);
 
+  const getUser = useCallback(() => fetcher.load("/api/user"), [fetcher]);
+
   useEffect(() => {
-    if (data) {
-      setUser?.(data?.currentUser);
+    getUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (fetcher.data) {
+      setUser?.(fetcher.data.currentUser);
     }
-  }, [data, setUser]);
+  }, [fetcher.data, setUser]);
 
   if (user?.id) {
     return (

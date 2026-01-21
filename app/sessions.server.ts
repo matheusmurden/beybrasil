@@ -5,6 +5,7 @@ interface SessionData {
   "startgg:token": string;
   "startgg:expires": string;
   "startgg:refresh": string;
+  "startgg:userinfo": string;
 }
 
 interface SessionFlashData {

@@ -2,6 +2,7 @@ import * as arctic from "arctic";
 import type { Route } from "./+types/OAuth";
 import { redirect } from "react-router";
 import { commitSession, getSession } from "~/sessions.server";
+import { access } from "node:fs/promises";
 
 const clientId =
   typeof import.meta.env.VITE_STARTGG_CLIENT_ID === "string"
@@ -45,6 +46,38 @@ export async function loader({ request }: Route.LoaderArgs) {
     session.set("startgg:token", accessToken);
     session.set("startgg:expires", accessTokenExpiresAt.toUTCString());
     session.set("startgg:refresh", refreshToken);
+
+    if (accessToken) {
+      const response = await fetch("https://api.start.gg/gql/alpha", {
+        method: "POST",
+        body: JSON.stringify({
+          query: `{
+            currentUser {
+                id
+                name
+                genderPronoun
+                player {
+                    prefix
+                    gamerTag
+                }
+                images(type: "profile") {
+                    url
+                    type
+                }
+            }
+          }`,
+        }),
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const userData = await response?.json();
+
+      const currentUser = userData?.data?.currentUser;
+      session.set("startgg:userinfo", JSON.stringify(currentUser));
+    }
 
     return redirect("/", {
       headers: {

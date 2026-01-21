@@ -140,6 +140,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       console.log(e);
     }
   }
+
   return { token };
 }
 
