@@ -3,6 +3,7 @@ export interface User {
   name: string;
   genderPronoun?: string;
   images: {
+    id: string;
     type: string;
     url: string;
   }[];
@@ -125,6 +126,11 @@ export interface TournamentObj {
   eventRegistrationClosesAt: number;
   events: EventObj[];
   state: TournamentStateEnum;
+  images?: {
+    id: string;
+    type: "banner" | "profile";
+    url: string;
+  }[];
   participants: {
     nodes: Participant[];
   };

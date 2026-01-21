@@ -77,6 +77,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                   state
                   isRegistrationOpen
                   eventRegistrationClosesAt
+                  images {
+                    id
+                    type
+                    url
+                  }
                   unpaidParticipants: participants(query: {
                     perPage: 512,
                     filter: {
@@ -206,7 +211,7 @@ export default function League({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="py-24 pt-32">
-      <div className="grid grid-cols-1 lg:grid-cols-2 place-items-center md:place-items-start gap-y-12">
+      <div className="flex flex-col place-items-center md:place-items-start gap-y-12">
         <TournamentList
           listTitle="Eventos Acontecendo AGORA"
           tournaments={currentTournaments}
