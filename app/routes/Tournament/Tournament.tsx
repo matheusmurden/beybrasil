@@ -395,8 +395,8 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                           <Table.Td className="text-center">
                             #{standing?.placement}
                           </Table.Td>
-                          <Table.Td>
-                            <div className="flex gap-2 items-center">
+                          <Table.Td className="overflow-hidden text-ellipsis w-fit max-w-full">
+                            <div className="flex gap-2 items-center w-full">
                               <Avatar
                                 className="cursor-pointer"
                                 name={standing?.player?.gamerTag}
@@ -407,14 +407,16 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                                 }
                                 alt={standing?.player?.gamerTag}
                               />
-                              {standing?.player?.prefix ? (
-                                <span className="text-neutral-500 dark:text-neutral-400">
-                                  {standing?.player?.prefix} |{" "}
-                                </span>
-                              ) : (
-                                ""
-                              )}
-                              {standing?.player?.gamerTag}
+                              <p className="inline-block overflow-hidden text-ellipsis whitespace-nowrap">
+                                {standing?.player?.prefix ? (
+                                  <span className="text-neutral-500 dark:text-neutral-400">
+                                    {standing?.player?.prefix} |{" "}
+                                  </span>
+                                ) : (
+                                  ""
+                                )}
+                                <span>{standing?.player?.gamerTag}</span>
+                              </p>
                             </div>
                           </Table.Td>
                           <Table.Td className="text-center">

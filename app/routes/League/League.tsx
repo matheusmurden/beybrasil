@@ -2,7 +2,7 @@ import manualContent from "~/assets/manualContent.json" with { type: "json" };
 import type { Route } from "./+types/League";
 import { redirect } from "react-router";
 import { getSession } from "~/sessions.server";
-import { TournamentList } from "~/components";
+import { TopRankedLeaguePlayers, TournamentList } from "~/components";
 import {
   TournamentStateEnum,
   type EventObj,
@@ -212,6 +212,9 @@ export default function League({ loaderData }: Route.ComponentProps) {
   return (
     <div className="py-24 pt-32">
       <div className="flex flex-col place-items-center md:place-items-start gap-y-12">
+        {!!ranking && ranking?.length > 0 && (
+          <TopRankedLeaguePlayers ranking={ranking} />
+        )}
         <TournamentList
           listTitle="Eventos Acontecendo AGORA"
           tournaments={currentTournaments}

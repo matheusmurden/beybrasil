@@ -6,3 +6,4 @@ export * from "./AppHeader";
 export * from "./TournamentList";
 export * from "./LoadingSpinner";
 export * from "./LeagueNavigation";
+export * from "./TopRankedLeaguePlayers";
