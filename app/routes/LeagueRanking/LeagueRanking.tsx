@@ -1,12 +1,13 @@
 import { getSession } from "~/sessions.server";
 import manualContent from "~/assets/manualContent.json" with { type: "json" };
 import { redirect } from "react-router";
-import type { LeagueObj, Standing } from "~/types";
+import type { LeagueObj, Standing, User } from "~/types";
 import type { Route } from "./+types/LeagueRanking";
-import { Avatar, Modal, Table } from "@mantine/core";
+import { Avatar, Modal, Pill, Table } from "@mantine/core";
 import { useNavigate } from "react-router";
 import classes from "./LeagueRanking.module.css";
 import { useColorScheme } from "@mantine/hooks";
+import classNames from "classnames";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
@@ -188,12 +189,15 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       }),
     );
 
+    const currentUser = session.get("startgg:userinfo");
+
     return {
       ranking,
       league,
       userTournamentCounts,
       numberOfRankedPodiumsByUser,
       numberOfRankedVictoriesByUser,
+      currentUser: currentUser ? (JSON.parse(currentUser) as User) : null,
     };
   } catch (e) {
     console.log(e);
@@ -256,8 +260,20 @@ export default function LeagueRanking({ loaderData }: Route.ComponentProps) {
           <Table.Tbody>
             {loaderData?.ranking?.map((standing) => (
               <Table.Tr key={standing?.id}>
-                <Table.Td className="text-center">
+                <Table.Td
+                  className={classNames("text-center", {
+                    "flex flex-col items-center justify-center":
+                      loaderData?.currentUser?.id ===
+                      standing?.player?.user?.id,
+                  })}
+                >
                   #{standing?.placement}
+                  {loaderData?.currentUser?.id ===
+                    standing?.player?.user?.id && (
+                    <Pill className="bg-violet-600 dark:bg-violet-300">
+                      Você
+                    </Pill>
+                  )}
                 </Table.Td>
                 <Table.Td className="overflow-hidden text-ellipsis w-fit max-w-full">
                   <div className="flex gap-2 items-center w-full">

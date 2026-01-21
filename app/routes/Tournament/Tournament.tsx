@@ -10,6 +10,7 @@ import {
   type LeagueObj,
   type Standing,
   type TournamentObj,
+  type User,
 } from "~/types";
 import { Form } from "react-router";
 import {
@@ -20,6 +21,7 @@ import {
   CheckboxGroup,
   Input,
   Modal,
+  Pill,
 } from "@mantine/core";
 import { useNavigate } from "react-router";
 import { useLocation } from "react-router";
@@ -185,8 +187,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       };
     } = await response.json();
 
+    const currentUser = session.get("startgg:userinfo");
+
     return {
       tournament: tournamentData?.data?.tournament,
+      currentUser: currentUser ? (JSON.parse(currentUser) as User) : null,
     };
   } catch (e) {
     console.log(e);
@@ -392,8 +397,20 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                     <Table.Tbody>
                       {event?.standings?.nodes.map((standing) => (
                         <Table.Tr key={standing?.id}>
-                          <Table.Td className="text-center">
+                          <Table.Td
+                            className={classNames("text-center", {
+                              "flex flex-col items-center justify-center":
+                                loaderData?.currentUser?.id ===
+                                standing?.player?.user?.id,
+                            })}
+                          >
                             #{standing?.placement}
+                            {loaderData?.currentUser?.id ===
+                              standing?.player?.user?.id && (
+                              <Pill className="bg-violet-600 dark:bg-violet-300">
+                                Você
+                              </Pill>
+                            )}
                           </Table.Td>
                           <Table.Td className="overflow-hidden text-ellipsis w-fit max-w-full">
                             <div className="flex gap-2 items-center w-full">
