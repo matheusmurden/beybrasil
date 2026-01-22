@@ -144,3 +144,40 @@ export interface TournamentObj {
     nodes: Participant[];
   };
 }
+
+export interface LeagueLoaderReturnType {
+  league: LeagueObj;
+  allRankedLeagueEvents: number[];
+  upcomingTournaments: TournamentObj[];
+  pastTournaments: TournamentObj[];
+  currentTournaments: TournamentObj[];
+  ranking: Standing[];
+  currentUser: User | null;
+  tournamentCounts: Record<number, Set<number>>;
+  tournamentparticipants: {
+    tournamentId: number;
+    userId: number;
+  }[];
+  userTournamentCounts: {
+    tournamentsCount: number;
+    userId: number;
+  }[];
+  numberOfRankedPodiumsByUser: (
+    | {
+        rankedEventId: number;
+        eventId: number;
+        isPodium: boolean;
+        userId: number;
+      }
+    | undefined
+  )[];
+  numberOfRankedVictoriesByUser: (
+    | {
+        rankedEventId: number;
+        eventId: number;
+        isVictory: boolean;
+        userId: number;
+      }
+    | undefined
+  )[];
+}

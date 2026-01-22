@@ -1,11 +1,18 @@
-import { type RouteConfig, index, route } from "@react-router/dev/routes";
+import {
+  type RouteConfig,
+  index,
+  layout,
+  route,
+} from "@react-router/dev/routes";
 
 export default [
   // BASE
   index("./routes/Home/Home.tsx"),
-  route("league/:acronym", "./routes/League/League.tsx", [
-    route("ranking", "./routes/LeagueRanking/LeagueRanking.tsx"),
-    route("tournament/:tournamentSlug", "./routes/Tournament/Tournament.tsx"),
+  layout("./layouts/LeagueLayout.tsx", [
+    route("league/:acronym", "./routes/League/League.tsx", [
+      route("ranking", "./routes/LeagueRanking/LeagueRanking.tsx"),
+      route("tournament/:tournamentSlug", "./routes/Tournament/Tournament.tsx"),
+    ]),
   ]),
   // AUTH
   { path: "/oauth", file: "./routes/OAuth/OAuth.tsx" },
