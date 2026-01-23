@@ -25,9 +25,9 @@ export const TournamentList = ({
   return (
     !!tournaments &&
     tournaments?.length > 0 && (
-      <div>
+      <div className="w-full">
         <h2 className="mb-2 font-semibold text-xl">{listTitle}</h2>
-        <ul className="flex flex-col lg:flex-row gap-6 w-full">
+        <ul className="flex flex-col lg:flex-row gap-6 w-full lg:w-fit">
           {tournaments?.map((i) => (
             <Card
               component="li"
