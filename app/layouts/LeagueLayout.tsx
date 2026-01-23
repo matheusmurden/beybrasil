@@ -17,11 +17,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const allValidLeagueSlugs = Object.entries(manualContent).filter(([, val]) =>
     Object.hasOwn(val, "league"),
   );
-  if (!token) {
-    return redirect("/login");
-  }
   if (
-    !allValidLeagueSlugs.some(([key]) => key === params.acronym.toLowerCase())
+    !allValidLeagueSlugs.some(([key]) => key === params?.acronym?.toLowerCase())
   ) {
     return redirect("/404");
   }
@@ -29,7 +26,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const leagueSlug = allValidLeagueSlugs
     ?.filter(
       ([key, val]) =>
-        key === params.acronym.toLowerCase() && Object.hasOwn(val, "league"),
+        key === params?.acronym?.toLowerCase() && Object.hasOwn(val, "league"),
     )
     ?.flatMap((i) => i[1] as { league: string })[0]?.league;
 
@@ -183,7 +180,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
           ?.filter((i) => !!i?.userId),
     );
 
-    const tournamentCounts = tournamentsParticipants.reduce(
+    const tournamentCounts = tournamentsParticipants?.reduce(
       (acc: Record<number, Set<number>>, i) => {
         acc[i?.userId] ??= new Set<number>();
         acc[i?.userId].add(i?.tournamentId);

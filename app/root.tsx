@@ -45,7 +45,6 @@ import { useDisclosure } from "@mantine/hooks";
 import { useNavigation } from "react-router";
 import { Link } from "react-router";
 import { TZDate } from "@date-fns/tz";
-import { clientSecret, scopes, clientId, redirectURL } from "./startgg.client";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -118,10 +117,11 @@ export async function loader({ request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
   const refreshToken = session.get("startgg:refresh");
   const tokenExpiresAt = session.get("startgg:expires");
+  const redirectPath = session.get("app:redirect");
 
   let isTokenExpiringSoon = false;
 
-  // Check if token is expiring "soon" (24h after the token has been originally emitted)
+  // Check if auth token is expiring "soon" (24h after the token has been originally emitted)
   if (
     !!tokenExpiresAt &&
     isBefore(
@@ -135,7 +135,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     );
     isTokenExpiringSoon = daysUntilExpiration <= 5 && daysUntilExpiration >= 0;
   }
-  // Clean Session Cookies
+  // Clean Auth Session Cookies if token is expired
   else if (
     !!tokenExpiresAt &&
     isAfter(
@@ -157,6 +157,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     }
   }
 
+  // Refresh Auth Token if token is not expired but is expiring "soon"
   if (tokenExpiresAt && isTokenExpiringSoon && refreshToken) {
     const res = await fetch("https://api.start.gg/oauth/refresh", {
       method: "POST",

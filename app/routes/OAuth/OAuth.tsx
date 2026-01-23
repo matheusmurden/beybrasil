@@ -106,11 +106,22 @@ export async function loader({ request }: Route.LoaderArgs) {
       session.set("startgg:userinfo", JSON.stringify(currentUser));
     }
 
-    return redirect("/", {
-      headers: {
-        "Set-Cookie": await commitSession(session),
-      },
-    });
+    const redirectPath = session.get("app:redirect");
+
+    if (redirectPath) {
+      session.unset("app:redirect");
+      return redirect(redirectPath, {
+        headers: {
+          "Set-Cookie": await commitSession(session),
+        },
+      });
+    } else {
+      return redirect("/", {
+        headers: {
+          "Set-Cookie": await commitSession(session),
+        },
+      });
+    }
   } catch {
     throw new Response("Something went wrong. Try again later.", {
       status: 400,

@@ -6,18 +6,26 @@ import {
 } from "@react-router/dev/routes";
 
 export default [
-  // BASE
   index("./routes/Home/Home.tsx"),
-  layout("./layouts/LeagueLayout.tsx", [
-    route("league/:acronym", "./routes/League/League.tsx", [
-      route("ranking", "./routes/LeagueRanking/LeagueRanking.tsx"),
-      route("tournament/:tournamentSlug", "./routes/Tournament/Tournament.tsx"),
+  // REQUIRED AUTH
+  layout("./layouts/AuthGuardLayout.tsx", [
+    // LEAGUE
+    layout("./layouts/LeagueLayout.tsx", [
+      route("league/:acronym", "./routes/League/League.tsx", [
+        // LEAGUE RANKING
+        route("ranking", "./routes/LeagueRanking/LeagueRanking.tsx"),
+        // TOURNAMENT DETAILS
+        route(
+          "tournament/:tournamentSlug",
+          "./routes/Tournament/Tournament.tsx",
+        ),
+      ]),
+      // API
+      route("/api/user", "./routes/api/User.tsx"),
     ]),
   ]),
-  // AUTH
-  { path: "/oauth", file: "./routes/OAuth/OAuth.tsx" },
-  { path: "/login", file: "./routes/Login/Login.tsx" },
-  { path: "/logout", file: "./routes/Logout/Logout.tsx" },
-  // API
-  { path: "/api/user", file: "./routes/api/User.tsx" },
+  // AUTH MANAGEMENT
+  route("/oauth", "./routes/OAuth/OAuth.tsx"),
+  route("/login", "./routes/Login/Login.tsx"),
+  route("/logout", "./routes/Logout/Logout.tsx"),
 ] satisfies RouteConfig;

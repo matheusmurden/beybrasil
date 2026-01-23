@@ -6,6 +6,7 @@ interface SessionData {
   "startgg:expires": string;
   "startgg:refresh": string;
   "startgg:userinfo": string;
+  "app:redirect": string;
 }
 
 interface SessionFlashData {

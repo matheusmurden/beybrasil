@@ -42,9 +42,6 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const allValidLeagueSlugs = Object.entries(manualContent).filter(([, val]) =>
     Object.hasOwn(val, "league"),
   );
-  if (!token) {
-    return redirect("/login");
-  }
   if (
     !allValidLeagueSlugs.some(([key]) => key === params.acronym.toLowerCase())
   ) {
