@@ -1,4 +1,4 @@
-export const BEYBLADE_X_VIDEOGAME_ID: number = 87913;
+export const BEYBLADE_X_VIDEOGAME_ID = 87913;
 
 export const RANKING_POINTS_BY_PLACEMENT: Record<number, number> = {
   1: 60,

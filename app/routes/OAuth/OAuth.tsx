@@ -2,7 +2,8 @@ import * as arctic from "arctic";
 import type { Route } from "./+types/OAuth";
 import { redirect } from "react-router";
 import { commitSession, getSession } from "~/sessions.server";
-import { access } from "node:fs/promises";
+import { TZDate } from "@date-fns/tz";
+import { add } from "date-fns";
 
 const clientId =
   typeof import.meta.env.VITE_STARTGG_CLIENT_ID === "string"
@@ -37,10 +38,36 @@ export async function loader({ request }: Route.LoaderArgs) {
     });
   }
   try {
-    const tokens = await startgg.validateAuthorizationCode(code, scopes);
-    const accessToken = tokens.accessToken();
-    const accessTokenExpiresAt = tokens.accessTokenExpiresAt();
-    const refreshToken = tokens.refreshToken();
+    const res = await fetch("https://api.start.gg/oauth/access_token", {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        grant_type: "authorization_code",
+        client_secret: clientSecret,
+        code: code,
+        scope: scopes,
+        client_id: clientId,
+        redirect_uri: redirectURL,
+      }),
+    });
+
+    const tokenData: {
+      access_token: string;
+      token_type: "Bearer";
+      expires_in: number;
+      refresh_token: string;
+    } = await res.json();
+
+    const accessToken = tokenData?.access_token;
+    const accessTokenExpiresAt = new TZDate(
+      add(new Date(), {
+        seconds: tokenData?.expires_in,
+      }),
+      "America/Sao_Paulo",
+    );
+    const refreshToken = tokenData?.refresh_token;
 
     const session = await getSession(request.headers.get("Cookie"));
     session.set("startgg:token", accessToken);

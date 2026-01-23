@@ -7,8 +7,9 @@ import { useEffect } from "react";
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
   try {
-    const hasToken = !!session.get("startgg:token");
-    return { hasToken };
+    const token = session.get("startgg:token");
+
+    return { hasToken: !!token };
   } catch (e) {
     console.log(e);
   }
@@ -21,6 +22,7 @@ export default function LoginRoute({ loaderData }: Route.ComponentProps) {
       setUser?.(undefined);
     }
   }, [loaderData?.hasToken, setUser]);
+
   return (
     !user?.id && (
       <div className="h-full w-full flex flex-col items-center justify-center">
