@@ -66,10 +66,10 @@ export const TournamentList = ({
                       </Pill>
                     )}
                     {i?.state === TournamentStateEnum.CREATED &&
-                      i?.isRegistrationOpen && (
+                      (i?.isRegistrationOpen ? (
                         <>
                           <Pill
-                            className={classNames(" text-white", {
+                            className={classNames("text-white", {
                               "bg-violet-500 dark:bg-violet-700":
                                 !isUserInTournament({
                                   userId: user?.id ?? 0,
@@ -92,7 +92,13 @@ export const TournamentList = ({
                             </p>
                           </Pill>
                         </>
-                      )}
+                      ) : (
+                        <>
+                          <Pill className="bg-gray-600 text-white">
+                            <p className="text-sm">Inscrições em breve</p>
+                          </Pill>
+                        </>
+                      ))}
                     <Pill size="md" className="dark:bg-neutral-600">
                       <p className="font-medium text-sm text text-gray-600 dark:text-neutral-200">
                         Data:{" "}
@@ -178,8 +184,7 @@ export const TournamentList = ({
 
               {/*Call to Action Section*/}
               {i?.state === TournamentStateEnum.CREATED &&
-                i?.isRegistrationOpen &&
-                !!user?.id && (
+                (i?.isRegistrationOpen ? (
                   <Card.Section withBorder className="p-4">
                     {!isUserInTournament({
                       userId: user?.id ?? 0,
@@ -209,7 +214,21 @@ export const TournamentList = ({
                       </Button>
                     )}
                   </Card.Section>
-                )}
+                ) : (
+                  <Card.Section withBorder className="p-4">
+                    <Button
+                      component="a"
+                      target="_blank"
+                      rel="no-referrer"
+                      href={`https://www.start.gg/${i?.slug}/details`}
+                      variant="outline"
+                      size="lg"
+                      w="100%"
+                    >
+                      Ver Detalhes
+                    </Button>
+                  </Card.Section>
+                ))}
 
               {[
                 TournamentStateEnum.COMPLETED,
