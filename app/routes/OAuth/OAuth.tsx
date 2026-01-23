@@ -1,4 +1,3 @@
-import * as arctic from "arctic";
 import type { Route } from "./+types/OAuth";
 import { redirect } from "react-router";
 import { commitSession, getSession } from "~/sessions.server";
@@ -18,10 +17,9 @@ const redirectURL =
     ? import.meta.env.VITE_STARTGG_REDIRECT_URL
     : "";
 
-const startgg = new arctic.StartGG(clientId, clientSecret, redirectURL);
-
 const scopes = [
   "user.identity",
+  "user.tournamentRegistration",
   "user.email",
   "tournament.manager",
   "tournament.reporter",

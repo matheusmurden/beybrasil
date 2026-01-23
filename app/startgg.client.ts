@@ -8,6 +8,7 @@ const state = arctic.generateState();
 
 export const scopes = [
   "user.identity",
+  "user.tournamentRegistration",
   "user.email",
   "tournament.manager",
   "tournament.reporter",

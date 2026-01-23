@@ -71,7 +71,7 @@ export interface EventObj {
   id: number;
   name: string;
   slug: string;
-  numEntrants?: number | null;
+  numEntrants?: number;
   entryFee?: number;
   prizingInfo?: {
     enablePrizing: boolean;

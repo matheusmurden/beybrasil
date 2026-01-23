@@ -186,33 +186,27 @@ export const TournamentList = ({
               {i?.state === TournamentStateEnum.CREATED &&
                 (i?.isRegistrationOpen ? (
                   <Card.Section withBorder className="p-4">
-                    {!isUserInTournament({
-                      userId: user?.id ?? 0,
-                      tournament: i,
-                    }) ? (
-                      <Button
-                        component="a"
-                        target="_blank"
-                        rel="no-referrer"
-                        href={`https://www.start.gg/${i?.slug}/register`}
-                        size="lg"
-                        w="100%"
-                      >
-                        Fazer Inscrição
-                      </Button>
-                    ) : (
-                      <Button
-                        component="a"
-                        target="_blank"
-                        rel="no-referrer"
-                        href={`https://www.start.gg/${i?.slug}/dashboard`}
-                        variant="outline"
-                        size="lg"
-                        w="100%"
-                      >
-                        Modificar Inscrição
-                      </Button>
-                    )}
+                    <Button
+                      size="lg"
+                      w="100%"
+                      variant={
+                        isUserInTournament({
+                          userId: user?.id ?? 0,
+                          tournament: i,
+                        })
+                          ? "outline"
+                          : "filled"
+                      }
+                      color="violet"
+                      onClick={() => navigate(`./${i?.slug}`)}
+                    >
+                      {isUserInTournament({
+                        userId: user?.id ?? 0,
+                        tournament: i,
+                      })
+                        ? "Modificar Inscrição"
+                        : "Fazer Inscrição"}
+                    </Button>
                   </Card.Section>
                 ) : (
                   <Card.Section withBorder className="p-4">

@@ -20,8 +20,9 @@ export const isUserInEvent = ({
   userId?: number;
   event: EventObj;
 }) => {
-  const userIdsInEvent = event?.entrants?.nodes?.flatMap((node) =>
-    node?.participants?.flatMap((i) => i?.user?.id),
-  );
-  return !!userId && userIdsInEvent?.includes(userId);
+  const result =
+    event?.entrants?.nodes
+      ?.flatMap((node) => node?.participants?.flatMap((i) => i?.user?.id))
+      ?.some((i) => i === userId) ?? [];
+  return result;
 };
