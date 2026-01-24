@@ -6,7 +6,6 @@
   display: grid;
   grid-template-columns: repeat(var(--gridColumns), minmax(0, 1fr));
   gap: 2rem;
-  padding-bottom: 8rem;
   @media (max-width: 959px) {
     --gridColumns: 1;
   }

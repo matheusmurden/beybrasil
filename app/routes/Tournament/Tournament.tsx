@@ -272,8 +272,6 @@ export async function action({ request, params }: Route.ActionArgs) {
       };
     } = await registrationFormResponse?.json();
 
-    console.log(registrationFormData);
-
     return {
       status: registrationFormData?.data?.registerForTournament?.id ? 200 : 400,
     };
