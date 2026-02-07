@@ -123,6 +123,21 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     entryFee
                     prizingInfo
                     rulesMarkdown
+                    entrants(query: { perPage: 100 }) {
+                      nodes {
+                        id
+                        name
+                        standing {
+                         placement
+                        }
+                        participants {
+                          id
+                          user {
+                            id
+                          }
+                        }
+                      }
+                    }
                     images {
                       id
                       url
@@ -172,7 +187,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
     const tournamentsParticipants = league?.events?.nodes?.flatMap(
       (tournamentNode) =>
-        tournamentNode?.tournament?.participants?.nodes
+        tournamentNode?.tournament?.allParticipants?.nodes
           ?.flatMap((i) => ({
             tournamentId: tournamentNode?.tournament?.id,
             userId: i?.user?.id,

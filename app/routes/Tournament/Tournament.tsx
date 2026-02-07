@@ -347,206 +347,206 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
       onClose={() => navigate(location.pathname.split("/tournament")[0])}
     >
       <Modal.Body className="p-4">
-        {!actionData?.status ? (
-          <h3 className="text-(--accentColor) underline">
-            Formulário de Inscrição{" "}
-          </h3>
-        ) : (
-          <p>
-            {actionData?.status === 200
-              ? "(Inscrição no torneio feita com sucesso)"
-              : actionData?.status === 400
-                ? "(Erro ao fazer inscrição no torneio)"
-                : ""}
-          </p>
-        )}
-        <Form action={undefined} method="post">
-          <CheckboxGroup
-            defaultValue={defaultValue}
-            label="Selecione os eventos que você quer participar"
-            description="Eventos ranqueados são obrigatórios"
-            withAsterisk
-          >
-            {tournament?.events?.map((event) => (
-              <Checkbox
-                key={event.id}
-                name={String(event.id)}
-                value={String(event.id)}
-                label={event?.name}
-                required={allRankedLeagueEvents?.some(
-                  (id) => Number(id) === event.id,
-                )}
-                className={classNames(
-                  "mt-4 pointer-events-auto",
-                  classes.Checkbox,
-                  {
-                    "pointer-events-none cursor-not-allowed":
-                      allRankedLeagueEvents?.some(
-                        (id) => Number(id) === event.id,
-                      ),
-                    [classes.Required]: allRankedLeagueEvents?.some(
-                      (id) => Number(id) === event.id,
-                    ),
-                  },
-                )}
-              />
-            ))}
-          </CheckboxGroup>
-          <Input name="userId" hidden value={loaderData?.currentUser?.id} />
-          <Button className="mt-6" type="submit">
-            {tournament?.events?.some((event) =>
-              isUserInEvent({ userId: loaderData?.currentUser?.id, event }),
-            )
-              ? "Modificar Inscrição"
-              : "Enviar Inscrição"}
-          </Button>
-        </Form>
-
         {tournament &&
-          [TournamentStateEnum.COMPLETED, TournamentStateEnum.ACTIVE].includes(
-            tournament.state,
-          ) && (
-            <div className="flex flex-col gap-8">
-              <Accordion
-                className="p-0"
-                defaultValue={String(
-                  tournament?.events.sort(sortByRanked)[0]?.id,
-                )}
-              >
-                {tournament?.events?.sort(sortByRanked)?.map((event) => (
-                  <Accordion.Item key={event.id} value={String(event.id)}>
-                    <Accordion.Control className="hover:bg-gray-200 dark:hover:bg-neutral-500 dark:bg-neutral-600">
-                      <h3 className="dark:text-neutral-300">{event.name}</h3>
-                    </Accordion.Control>
-                    {event?.standings?.nodes?.length > 0 ? (
-                      <Accordion.Panel>
-                        <Table
-                          highlightOnHover
-                          highlightOnHoverColor={
-                            colorScheme === "dark" ? "dark" : undefined
-                          }
-                        >
-                          <Table.Thead>
-                            <Table.Tr>
-                              <Table.Th className="text-center">
-                                Posição
-                              </Table.Th>
-                              <Table.Th>Blader</Table.Th>
-                              <Table.Th className="text-center">
-                                Vitórias
-                              </Table.Th>
-                              <Table.Th className="text-center">
-                                Derrotas
-                              </Table.Th>
+        [TournamentStateEnum.COMPLETED, TournamentStateEnum.ACTIVE].includes(
+          tournament.state,
+        ) ? (
+          <div className="flex flex-col gap-8">
+            <Accordion
+              className="p-0"
+              defaultValue={String(
+                tournament?.events.sort(sortByRanked)[0]?.id,
+              )}
+            >
+              {tournament?.events?.sort(sortByRanked)?.map((event) => (
+                <Accordion.Item key={event.id} value={String(event.id)}>
+                  <Accordion.Control className="hover:bg-gray-200 dark:hover:bg-neutral-500 dark:bg-neutral-600">
+                    <h3 className="dark:text-neutral-300">{event.name}</h3>
+                  </Accordion.Control>
+                  {event?.standings?.nodes?.length > 0 ? (
+                    <Accordion.Panel>
+                      <Table
+                        highlightOnHover
+                        highlightOnHoverColor={
+                          colorScheme === "dark" ? "dark" : undefined
+                        }
+                      >
+                        <Table.Thead>
+                          <Table.Tr>
+                            <Table.Th className="text-center">Posição</Table.Th>
+                            <Table.Th>Blader</Table.Th>
+                            <Table.Th className="text-center">
+                              Vitórias
+                            </Table.Th>
+                            <Table.Th className="text-center">
+                              Derrotas
+                            </Table.Th>
+                            {allRankedLeagueEvents?.includes(event?.id) && (
+                              <>
+                                <Table.Th className="text-center">
+                                  Ganhou Pontos Ranqueados
+                                </Table.Th>
+                                <Table.Th className="text-center">
+                                  Pontuação Ranqueada Atual
+                                </Table.Th>
+                                <Table.Th className="text-center">
+                                  Posicão Atual no Ranking
+                                </Table.Th>
+                              </>
+                            )}
+                          </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>
+                          {event?.standings?.nodes.map((standing) => (
+                            <Table.Tr key={standing?.id}>
+                              <Table.Td
+                                className={classNames("text-center", {
+                                  "flex flex-col items-center justify-center":
+                                    loaderData?.currentUser?.id ===
+                                    standing?.player?.user?.id,
+                                })}
+                              >
+                                #{standing?.placement}
+                                {loaderData?.currentUser?.id ===
+                                  standing?.player?.user?.id && (
+                                  <Pill className="bg-violet-600 dark:bg-violet-300">
+                                    Você
+                                  </Pill>
+                                )}
+                              </Table.Td>
+                              <Table.Td className="overflow-hidden text-ellipsis w-fit max-w-full">
+                                <div className="flex gap-2 items-center w-full">
+                                  <Avatar
+                                    className="cursor-pointer"
+                                    name={standing?.player?.gamerTag}
+                                    src={
+                                      standing?.player?.user?.images?.find(
+                                        (image) => image?.type === "profile",
+                                      )?.url ?? ""
+                                    }
+                                    alt={standing?.player?.gamerTag}
+                                  />
+                                  <p className="inline-block overflow-hidden text-ellipsis whitespace-nowrap">
+                                    {standing?.player?.prefix ? (
+                                      <span className="text-neutral-500 dark:text-neutral-400">
+                                        {standing?.player?.prefix} |{" "}
+                                      </span>
+                                    ) : (
+                                      ""
+                                    )}
+                                    <span>{standing?.player?.gamerTag}</span>
+                                  </p>
+                                </div>
+                              </Table.Td>
+                              <Table.Td className="text-center">
+                                {standing.setRecordWithoutByes?.wins}
+                              </Table.Td>
+                              <Table.Td className="text-center">
+                                {standing.setRecordWithoutByes?.losses}
+                              </Table.Td>
                               {allRankedLeagueEvents?.includes(event?.id) && (
                                 <>
-                                  <Table.Th className="text-center">
-                                    Ganhou Pontos Ranqueados
-                                  </Table.Th>
-                                  <Table.Th className="text-center">
-                                    Pontuação Ranqueada Atual
-                                  </Table.Th>
-                                  <Table.Th className="text-center">
-                                    Posicão Atual no Ranking
-                                  </Table.Th>
+                                  <Table.Td className="text-center">
+                                    {RANKING_POINTS_BY_PLACEMENT?.[
+                                      standing?.placement
+                                    ]
+                                      ? `+${
+                                          RANKING_POINTS_BY_PLACEMENT?.[
+                                            standing?.placement
+                                          ]
+                                        }`
+                                      : "+10"}
+                                  </Table.Td>
+                                  <Table.Td className="text-center">
+                                    {
+                                      ranking?.find(
+                                        (i) =>
+                                          i?.player?.user?.id ===
+                                          standing?.player?.user?.id,
+                                      )?.totalPoints
+                                    }
+                                  </Table.Td>
+                                  <Table.Td className="text-center">
+                                    {
+                                      ranking?.find(
+                                        (i) =>
+                                          i?.player?.user?.id ===
+                                          standing?.player?.user?.id,
+                                      )?.placement
+                                    }
+                                  </Table.Td>
                                 </>
                               )}
                             </Table.Tr>
-                          </Table.Thead>
-                          <Table.Tbody>
-                            {event?.standings?.nodes.map((standing) => (
-                              <Table.Tr key={standing?.id}>
-                                <Table.Td
-                                  className={classNames("text-center", {
-                                    "flex flex-col items-center justify-center":
-                                      loaderData?.currentUser?.id ===
-                                      standing?.player?.user?.id,
-                                  })}
-                                >
-                                  #{standing?.placement}
-                                  {loaderData?.currentUser?.id ===
-                                    standing?.player?.user?.id && (
-                                    <Pill className="bg-violet-600 dark:bg-violet-300">
-                                      Você
-                                    </Pill>
-                                  )}
-                                </Table.Td>
-                                <Table.Td className="overflow-hidden text-ellipsis w-fit max-w-full">
-                                  <div className="flex gap-2 items-center w-full">
-                                    <Avatar
-                                      className="cursor-pointer"
-                                      name={standing?.player?.gamerTag}
-                                      src={
-                                        standing?.player?.user?.images?.find(
-                                          (image) => image?.type === "profile",
-                                        )?.url ?? ""
-                                      }
-                                      alt={standing?.player?.gamerTag}
-                                    />
-                                    <p className="inline-block overflow-hidden text-ellipsis whitespace-nowrap">
-                                      {standing?.player?.prefix ? (
-                                        <span className="text-neutral-500 dark:text-neutral-400">
-                                          {standing?.player?.prefix} |{" "}
-                                        </span>
-                                      ) : (
-                                        ""
-                                      )}
-                                      <span>{standing?.player?.gamerTag}</span>
-                                    </p>
-                                  </div>
-                                </Table.Td>
-                                <Table.Td className="text-center">
-                                  {standing.setRecordWithoutByes?.wins}
-                                </Table.Td>
-                                <Table.Td className="text-center">
-                                  {standing.setRecordWithoutByes?.losses}
-                                </Table.Td>
-                                {allRankedLeagueEvents?.includes(event?.id) && (
-                                  <>
-                                    <Table.Td className="text-center">
-                                      {RANKING_POINTS_BY_PLACEMENT?.[
-                                        standing?.placement
-                                      ] > 0
-                                        ? `+${
-                                            RANKING_POINTS_BY_PLACEMENT?.[
-                                              standing?.placement
-                                            ]
-                                          }`
-                                        : 0}
-                                    </Table.Td>
-                                    <Table.Td className="text-center">
-                                      {
-                                        ranking?.find(
-                                          (i) =>
-                                            i?.player?.user?.id ===
-                                            standing?.player?.user?.id,
-                                        )?.totalPoints
-                                      }
-                                    </Table.Td>
-                                    <Table.Td className="text-center">
-                                      {
-                                        ranking?.find(
-                                          (i) =>
-                                            i?.player?.user?.id ===
-                                            standing?.player?.user?.id,
-                                        )?.placement
-                                      }
-                                    </Table.Td>
-                                  </>
-                                )}
-                              </Table.Tr>
-                            ))}
-                          </Table.Tbody>
-                        </Table>
-                      </Accordion.Panel>
-                    ) : (
-                      <p>Ainda não há resultados para este evento.</p>
+                          ))}
+                        </Table.Tbody>
+                      </Table>
+                    </Accordion.Panel>
+                  ) : (
+                    <p>Ainda não há resultados para este evento.</p>
+                  )}
+                </Accordion.Item>
+              ))}
+            </Accordion>
+          </div>
+        ) : (
+          <>
+            {!actionData?.status ? (
+              <h3 className="text-(--accentColor) underline">
+                Formulário de Inscrição{" "}
+              </h3>
+            ) : (
+              <p>
+                {actionData?.status === 200
+                  ? "(Inscrição no torneio feita com sucesso)"
+                  : actionData?.status === 400
+                    ? "(Erro ao fazer inscrição no torneio)"
+                    : ""}
+              </p>
+            )}
+            <Form action={undefined} method="post">
+              <CheckboxGroup
+                defaultValue={defaultValue}
+                label="Selecione os eventos que você quer participar"
+                description="Eventos ranqueados são obrigatórios"
+                withAsterisk
+              >
+                {tournament?.events?.map((event) => (
+                  <Checkbox
+                    key={event.id}
+                    name={String(event.id)}
+                    value={String(event.id)}
+                    label={event?.name}
+                    required={allRankedLeagueEvents?.some(
+                      (id) => Number(id) === event.id,
                     )}
-                  </Accordion.Item>
+                    className={classNames(
+                      "mt-4 pointer-events-auto",
+                      classes.Checkbox,
+                      {
+                        "pointer-events-none cursor-not-allowed":
+                          allRankedLeagueEvents?.some(
+                            (id) => Number(id) === event.id,
+                          ),
+                        [classes.Required]: allRankedLeagueEvents?.some(
+                          (id) => Number(id) === event.id,
+                        ),
+                      },
+                    )}
+                  />
                 ))}
-              </Accordion>
-            </div>
-          )}
+              </CheckboxGroup>
+              <Input name="userId" hidden value={loaderData?.currentUser?.id} />
+              <Button className="mt-6" type="submit">
+                {tournament?.events?.some((event) =>
+                  isUserInEvent({ userId: loaderData?.currentUser?.id, event }),
+                )
+                  ? "Modificar Inscrição"
+                  : "Enviar Inscrição"}
+              </Button>
+            </Form>
+          </>
+        )}
       </Modal.Body>
     </Modal>
   );

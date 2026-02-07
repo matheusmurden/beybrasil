@@ -108,9 +108,11 @@ export default function LeagueRanking() {
                   {standing.totalPoints}
                 </Table.Td>
                 <Table.Td className="text-center">
-                  {userTournamentCounts?.find(
-                    (i) => i?.userId === standing?.player?.user?.id,
-                  )?.tournamentsCount ?? 0}
+                  {
+                    userTournamentCounts?.find(
+                      (i) => i?.userId === standing?.player?.user?.id,
+                    )?.tournamentsCount
+                  }
                 </Table.Td>
                 <Table.Td className="text-center">
                   {

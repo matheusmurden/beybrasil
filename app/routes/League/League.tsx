@@ -13,6 +13,7 @@ export default function League() {
     pastTournaments,
     allRankedLeagueEvents,
     ranking,
+    ...rest
   } = useOutletContext<LeagueLoaderReturnType>();
 
   const { setNavTitle } = useNavContext();
@@ -57,6 +58,7 @@ export default function League() {
           pastTournaments,
           allRankedLeagueEvents,
           ranking,
+          ...rest,
         }}
       />
     </div>
