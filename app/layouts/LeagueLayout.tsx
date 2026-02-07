@@ -191,8 +191,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
           ?.flatMap((i) => ({
             tournamentId: tournamentNode?.tournament?.id,
             userId: i?.user?.id,
+            isOver:
+              tournamentNode?.tournament?.state ===
+              TournamentStateEnum.COMPLETED,
           }))
-          ?.filter((i) => !!i?.userId),
+          ?.filter((i) => !!i?.userId && i?.isOver),
     );
 
     const tournamentCounts = tournamentsParticipants?.reduce(
