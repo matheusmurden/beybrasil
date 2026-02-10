@@ -116,14 +116,7 @@ export interface Entrant {
   name: string;
   participants: Participant[];
   standing?: Standing;
-  team?: {
-    id: number;
-    name: string;
-    images?: {
-      url: string;
-      type: string;
-    }[];
-  };
+  team?: Team;
 }
 
 export interface TournamentObj {
@@ -151,6 +144,23 @@ export interface TournamentObj {
   };
   allParticipants: {
     nodes: Participant[];
+  };
+}
+
+export interface Team {
+  id: number;
+  name: string;
+  images?: {
+    id: number;
+    url: string;
+    type: string;
+  }[];
+  members?: TeamMember[];
+}
+
+export interface TeamMember {
+  player: {
+    user: User;
   };
 }
 

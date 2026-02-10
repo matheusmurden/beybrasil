@@ -72,12 +72,12 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                   state
                   isRegistrationOpen
                   eventRegistrationClosesAt
-                  images {
+                  images(type: "profile") {
                     type
                     url
                   }
                   allParticipants: participants(query: {
-                    perPage: 150,
+                    perPage: 100,
                   }) {
                     nodes {
                       gamerTag
@@ -92,25 +92,6 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     name
                     state
                     startAt
-                    entrants(query: { perPage: 150 }) {
-                      nodes {
-                        id
-                        name
-                        standing {
-                         placement
-                         player {
-                          id
-                            user {
-                              id
-                            }
-                         }
-                        }
-                      }
-                    }
-                    images {
-                      url
-                      type
-                    }
                   }
                 }
               }

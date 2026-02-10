@@ -17,6 +17,7 @@ import {
   Accordion,
   Avatar,
   Button,
+  Card,
   Checkbox,
   CheckboxGroup,
   Input,
@@ -108,6 +109,13 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     team {
                       id
                       name
+                      members {
+                        player {
+                          user {
+                            id
+                          }
+                        }
+                      }
                       images {
                         url
                         type
@@ -183,11 +191,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       };
     } = await response.json();
 
-    const currentUser = session.get("startgg:userinfo");
-
     return {
       tournament: tournamentData?.data?.tournament,
-      currentUser: currentUser ? (JSON.parse(currentUser) as User) : null,
     };
   } catch (e) {
     console.log(e);
@@ -299,11 +304,13 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { league, allRankedLeagueEvents, ranking } = useOutletContext<{
-    league: LeagueObj;
-    allRankedLeagueEvents: number[];
-    ranking: Standing[];
-  }>();
+  const { league, allRankedLeagueEvents, ranking, currentUser } =
+    useOutletContext<{
+      league: LeagueObj;
+      allRankedLeagueEvents: number[];
+      ranking: Standing[];
+      currentUser: User | null;
+    }>();
 
   const tournament = loaderData?.tournament;
 
@@ -325,7 +332,7 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
         .map((i) => i?.id) ?? []),
       ...(tournament?.events
         ?.filter((event) =>
-          isUserInEvent({ userId: loaderData?.currentUser?.id ?? 0, event }),
+          isUserInEvent({ userId: currentUser?.id ?? 0, event }),
         )
         ?.map((i) => i?.id) ?? []),
     ]),
@@ -417,18 +424,30 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                               <Table.Td
                                 className={classNames("text-center", {
                                   "flex flex-col items-center justify-center":
-                                    loaderData?.currentUser?.id ===
-                                    standing?.player?.user?.id,
+                                    currentUser?.id ===
+                                      standing?.player?.user?.id ||
+                                    standing?.entrant?.team?.members?.find(
+                                      (member) =>
+                                        member?.player?.user?.id ===
+                                        currentUser?.id,
+                                    ),
                                 })}
                               >
                                 #{standing?.placement}
-                                {loaderData?.currentUser?.id ===
-                                  standing?.player?.user?.id && (
+                                {currentUser?.id ===
+                                  standing?.player?.user?.id ||
+                                standing?.entrant?.team?.members?.find(
+                                  (member) =>
+                                    member?.player?.user?.id ===
+                                    currentUser?.id,
+                                ) ? (
                                   <Pill className="bg-violet-600 dark:bg-violet-300">
                                     <span className="text-neutral-200">
                                       Você
                                     </span>
                                   </Pill>
+                                ) : (
+                                  <></>
                                 )}
                               </Table.Td>
                               <Table.Td className="overflow-hidden text-ellipsis w-fit max-w-full">
@@ -512,6 +531,160 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                           ))}
                         </Table.Tbody>
                       </Table>
+                      <Card
+                        shadow="lg"
+                        className="block lg:hidden dark:bg-neutral-700"
+                      >
+                        {event?.standings?.nodes?.map((standing) => (
+                          <Card
+                            my={12}
+                            shadow="sm"
+                            withBorder
+                            className={classNames(
+                              "p-6 dark:bg-neutral-800 dark:border-neutral-600",
+                              {
+                                ["border-violet-600 dark:border-violet-300"]:
+                                  currentUser?.id ===
+                                    standing?.player?.user?.id ||
+                                  standing?.entrant?.team?.members?.find(
+                                    (member) =>
+                                      member?.player?.user?.id ===
+                                      currentUser?.id,
+                                  ),
+                              },
+                            )}
+                            key={standing?.id}
+                          >
+                            <div className="flex flex-col gap-6 items-start justify-center">
+                              <div
+                                className={classNames(
+                                  "items-center justify-start w-full",
+                                  classes.CardTitle,
+                                )}
+                              >
+                                <span
+                                  className={classNames(
+                                    "leading-tight block w-full",
+                                    {
+                                      "text-amber-500 text-xl font-bold ":
+                                        standing?.placement === 1,
+                                      "text-gray-400 text-xl font-bold ":
+                                        standing?.placement === 2,
+                                      "text-amber-700 text-xl font-bold ":
+                                        standing?.placement === 3,
+                                      "text-violet-600 dark:text-violet-300 font-bold ":
+                                        currentUser?.id ===
+                                          standing?.player?.user?.id ||
+                                        standing?.entrant?.team?.members?.find(
+                                          (member) =>
+                                            member?.player?.user?.id ===
+                                            currentUser?.id,
+                                        ),
+                                      "text-neutral-400 dark:text-neutral-500 text-sm font-medium":
+                                        standing?.placement > 3,
+                                    },
+                                  )}
+                                >
+                                  #{standing?.placement}
+                                </span>
+                                <div className="flex gap-2 items-center">
+                                  <Avatar
+                                    className="cursor-pointer"
+                                    name={
+                                      standing?.player?.gamerTag ??
+                                      standing?.entrant?.team?.name
+                                    }
+                                    src={
+                                      standing?.player?.user?.images?.find(
+                                        (image) => image?.type === "profile",
+                                      )?.url ??
+                                      standing?.entrant?.team?.images?.find(
+                                        (image) => image?.type === "profile",
+                                      )?.url ??
+                                      ""
+                                    }
+                                    alt={
+                                      standing?.player?.gamerTag ??
+                                      standing?.entrant?.team?.name
+                                    }
+                                  />
+                                  <p className="inline-block overflow-hidden text-ellipsis whitespace-nowrap">
+                                    {standing?.player?.prefix ? (
+                                      <span className="text-neutral-500 dark:text-neutral-400">
+                                        {standing?.player?.prefix} |{" "}
+                                      </span>
+                                    ) : (
+                                      ""
+                                    )}
+                                    <span>
+                                      {standing?.player?.gamerTag ??
+                                        standing?.entrant?.team?.name}
+                                    </span>
+                                  </p>
+                                </div>
+                              </div>
+                              <div
+                                className={classNames(
+                                  "w-full",
+                                  classes.CardInfo,
+                                )}
+                              >
+                                <div className="leading-tight flex flex-col justify-between gap-2">
+                                  <label className="text-xs text-neutral-500 font-mono tracking-tighter">
+                                    Vitórias
+                                  </label>
+                                  <span className="font-medium">
+                                    {standing.setRecordWithoutByes?.wins}
+                                  </span>
+                                </div>
+                                <div className="leading-tight flex flex-col justify-between gap-2">
+                                  <label className="text-xs text-neutral-500 font-mono tracking-tighter">
+                                    Derrotas
+                                  </label>
+                                  <span className="font-medium">
+                                    {standing.setRecordWithoutByes?.losses}
+                                  </span>
+                                </div>
+                                {allRankedLeagueEvents?.includes(event?.id) && (
+                                  <>
+                                    <div className="leading-tight flex flex-col justify-between gap-2">
+                                      <label className="text-xs text-neutral-500 font-mono tracking-tighter">
+                                        Ganhou Pts.
+                                      </label>
+                                      <span className="font-medium">
+                                        {RANKING_POINTS_BY_PLACEMENT?.[
+                                          standing?.placement
+                                        ]
+                                          ? `+${
+                                              RANKING_POINTS_BY_PLACEMENT?.[
+                                                standing?.placement
+                                              ]
+                                            }`
+                                          : "+10"}
+                                      </span>
+                                    </div>
+                                    <div className="leading-tight flex flex-col justify-between gap-2">
+                                      <label className="text-xs text-neutral-500 font-mono tracking-tighter">
+                                        Ranking Atual
+                                      </label>
+                                      <span className="font-medium">
+                                        #
+                                        {
+                                          ranking?.find(
+                                            (i) =>
+                                              i?.player?.user?.id ===
+                                              standing?.player?.user?.id,
+                                          )?.placement
+                                        }
+                                      </span>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </Card>
+                        ))}
+                      </Card>
                     </Accordion.Panel>
                   ) : (
                     <p>Ainda não há resultados para este evento.</p>
@@ -567,10 +740,10 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                   />
                 ))}
               </CheckboxGroup>
-              <Input name="userId" hidden value={loaderData?.currentUser?.id} />
+              <Input name="userId" hidden value={currentUser?.id} />
               <Button className="mt-6" type="submit">
                 {tournament?.events?.some((event) =>
-                  isUserInEvent({ userId: loaderData?.currentUser?.id, event }),
+                  isUserInEvent({ userId: currentUser?.id, event }),
                 )
                   ? "Modificar Inscrição"
                   : "Enviar Inscrição"}

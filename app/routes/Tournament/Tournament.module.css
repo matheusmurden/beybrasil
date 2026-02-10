@@ -29,3 +29,15 @@
     }
   }
 }
+
+.CardTitle {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 0.5rem;
+}
+
+.CardInfo {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
