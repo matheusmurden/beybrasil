@@ -541,7 +541,7 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                             shadow="sm"
                             withBorder
                             className={classNames(
-                              "p-6 dark:bg-neutral-800 dark:border-neutral-600",
+                              "p-2 md:p-6 dark:bg-neutral-800 dark:border-neutral-600",
                               {
                                 ["border-violet-600 dark:border-violet-300"]:
                                   currentUser?.id ===
