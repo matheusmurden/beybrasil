@@ -117,7 +117,6 @@ export async function loader({ request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
   const refreshToken = session.get("startgg:refresh");
   const tokenExpiresAt = session.get("startgg:expires");
-  const redirectPath = session.get("app:redirect");
 
   let isTokenExpiringSoon = false;
 
