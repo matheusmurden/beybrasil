@@ -365,7 +365,7 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
       opened
       onClose={() => navigate(location.pathname.split("/tournament")[0])}
     >
-      <Modal.Body className="p-4">
+      <Modal.Body className="p-0">
         {tournament &&
         [TournamentStateEnum.COMPLETED, TournamentStateEnum.ACTIVE].includes(
           tournament.state,
@@ -630,7 +630,7 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                                 )}
                               >
                                 <div className="leading-tight flex flex-col justify-between gap-2">
-                                  <label className="text-xs text-neutral-500 font-mono tracking-tighter">
+                                  <label className="text-[9px] sm:text-xs text-neutral-500 font-mono tracking-tighter">
                                     Vitórias
                                   </label>
                                   <span className="font-medium">
@@ -638,7 +638,7 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                                   </span>
                                 </div>
                                 <div className="leading-tight flex flex-col justify-between gap-2">
-                                  <label className="text-xs text-neutral-500 font-mono tracking-tighter">
+                                  <label className="text-[9px] sm:text-xs text-neutral-500 font-mono tracking-tighter">
                                     Derrotas
                                   </label>
                                   <span className="font-medium">
@@ -648,7 +648,7 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                                 {allRankedLeagueEvents?.includes(event?.id) && (
                                   <>
                                     <div className="leading-tight flex flex-col justify-between gap-2">
-                                      <label className="text-xs text-neutral-500 font-mono tracking-tighter">
+                                      <label className="text-[9px] sm:text-xs text-neutral-500 font-mono tracking-tighter">
                                         Ganhou Pts.
                                       </label>
                                       <span className="font-medium">
@@ -664,7 +664,7 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                                       </span>
                                     </div>
                                     <div className="leading-tight flex flex-col justify-between gap-2">
-                                      <label className="text-xs text-neutral-500 font-mono tracking-tighter">
+                                      <label className="text-[9px] sm:text-xs text-neutral-500 font-mono tracking-tighter">
                                         Ranking Atual
                                       </label>
                                       <span className="font-medium">

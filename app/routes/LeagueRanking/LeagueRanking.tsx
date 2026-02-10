@@ -385,13 +385,13 @@ export default function LeagueRanking({ loaderData }: Route.ComponentProps) {
                 </div>
                 <div className={classNames("w-full", classes.CardInfo)}>
                   <div className="leading-tight flex flex-col justify-between gap-2">
-                    <label className="text-xs text-neutral-500 font-mono tracking-tighter">
+                    <label className="text-[9px] sm:text-xs text-neutral-500 font-mono tracking-tighter">
                       Pontuação
                     </label>
                     <span className="font-medium">{standing?.totalPoints}</span>
                   </div>
                   <div className="leading-tight flex flex-col justify-between gap-2">
-                    <label className="text-xs text-neutral-500 font-mono tracking-tighter">
+                    <label className="text-[9px] sm:text-xs text-neutral-500 font-mono tracking-tighter">
                       Campeonatos
                     </label>
                     <span className="font-medium">
@@ -403,7 +403,7 @@ export default function LeagueRanking({ loaderData }: Route.ComponentProps) {
                     </span>
                   </div>
                   <div className="leading-tight flex flex-col justify-between gap-2">
-                    <label className="text-xs text-neutral-500 font-mono tracking-tighter">
+                    <label className="text-[9px] sm:text-xs text-neutral-500 font-mono tracking-tighter">
                       Pódios
                     </label>
                     <span className="font-medium">
@@ -415,7 +415,7 @@ export default function LeagueRanking({ loaderData }: Route.ComponentProps) {
                     </span>
                   </div>
                   <div className="leading-tight flex flex-col justify-between gap-2">
-                    <label className="text-xs text-neutral-500 font-mono tracking-tighter">
+                    <label className="text-[9px] sm:text-xs text-neutral-500 font-mono tracking-tighter">
                       Campeã(o)
                     </label>
                     <span className="font-medium">
