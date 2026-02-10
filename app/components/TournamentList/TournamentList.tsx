@@ -61,7 +61,7 @@ export const TournamentList = ({
                       </Pill>
                     )}
                     {i?.state === TournamentStateEnum.COMPLETED && (
-                      <Pill className=" text-white bg-green-500 dark:bg-green-700">
+                      <Pill className=" bg-none dark:bg-neutral-700 text-green-500 border border-green-500 dark:border-green-700">
                         <p className="text-sm">Evento Concluído</p>
                       </Pill>
                     )}
@@ -108,7 +108,7 @@ export const TournamentList = ({
                                 i?.startAt * 1000,
                                 "America/Sao_Paulo",
                               ),
-                              "dd 'de' MMMM",
+                              "dd 'de' MMMM 'às' HH:mm",
                               {
                                 locale: ptBR,
                               },

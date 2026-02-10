@@ -90,11 +90,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     id
                     slug
                     name
-                    numEntrants
                     state
                     startAt
-                    prizingInfo
-                    rulesMarkdown
                     entrants(query: { perPage: 150 }) {
                       nodes {
                         id

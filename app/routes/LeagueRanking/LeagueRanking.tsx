@@ -47,6 +47,9 @@ export default function LeagueRanking() {
         onClose={() => navigate(location.pathname.split("/ranking")[0])}
       >
         <Table
+          className="hidden lg:table"
+          stickyHeader
+          stickyHeaderOffset={60}
           highlightOnHover
           highlightOnHoverColor={colorScheme === "dark" ? "dark" : undefined}
         >

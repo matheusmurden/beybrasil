@@ -46,6 +46,7 @@ export interface Standing {
       displayValue?: string;
     };
   };
+  entrant: Entrant;
 }
 
 export enum ActivityStateEnum {
@@ -115,6 +116,14 @@ export interface Entrant {
   name: string;
   participants: Participant[];
   standing?: Standing;
+  team?: {
+    id: number;
+    name: string;
+    images?: {
+      url: string;
+      type: string;
+    }[];
+  };
 }
 
 export interface TournamentObj {

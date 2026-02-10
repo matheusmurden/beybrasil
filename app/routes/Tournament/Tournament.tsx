@@ -102,6 +102,18 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                   placement
                   totalPoints
                   setRecordWithoutByes
+                  entrant {
+                    id
+                    name
+                    team {
+                      id
+                      name
+                      images {
+                        url
+                        type
+                      }
+                    }
+                  }
                   stats {
                     score {
                       value
@@ -366,6 +378,9 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                   {event?.standings?.nodes?.length > 0 ? (
                     <Accordion.Panel>
                       <Table
+                        className="hidden lg:table"
+                        stickyHeader
+                        stickyHeaderOffset={60}
                         highlightOnHover
                         highlightOnHoverColor={
                           colorScheme === "dark" ? "dark" : undefined
@@ -420,13 +435,23 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                                 <div className="flex gap-2 items-center w-full">
                                   <Avatar
                                     className="cursor-pointer"
-                                    name={standing?.player?.gamerTag}
+                                    name={
+                                      standing?.player?.gamerTag ??
+                                      standing?.entrant?.team?.name
+                                    }
                                     src={
                                       standing?.player?.user?.images?.find(
                                         (image) => image?.type === "profile",
-                                      )?.url ?? ""
+                                      )?.url ??
+                                      standing?.entrant?.team?.images?.find(
+                                        (image) => image?.type === "profile",
+                                      )?.url ??
+                                      ""
                                     }
-                                    alt={standing?.player?.gamerTag}
+                                    alt={
+                                      standing?.player?.gamerTag ??
+                                      standing?.entrant?.team?.name
+                                    }
                                   />
                                   <p className="inline-block overflow-hidden text-ellipsis whitespace-nowrap">
                                     {standing?.player?.prefix ? (
@@ -436,7 +461,10 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                                     ) : (
                                       ""
                                     )}
-                                    <span>{standing?.player?.gamerTag}</span>
+                                    <span>
+                                      {standing?.player?.gamerTag ??
+                                        standing?.entrant?.name}
+                                    </span>
                                   </p>
                                 </div>
                               </Table.Td>
@@ -469,6 +497,7 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                                     }
                                   </Table.Td>
                                   <Table.Td className="text-center">
+                                    #
                                     {
                                       ranking?.find(
                                         (i) =>
