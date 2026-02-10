@@ -73,38 +73,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                   isRegistrationOpen
                   eventRegistrationClosesAt
                   images {
-                    id
                     type
                     url
                   }
-                  unpaidParticipants: participants(query: {
-                    perPage: 512,
-                    filter: {
-                      unpaid: true
-                    }
-                  }) {
-                    nodes {
-                      gamerTag
-                      user {
-                        id
-                      }
-                    }
-                  }
-                  paidParticipants: participants(query: {
-                    perPage: 512,
-                    filter: {
-                      unpaid: false
-                    }
-                  }) {
-                    nodes {
-                      gamerTag
-                      user {
-                        id
-                      }
-                    }
-                  }
                   allParticipants: participants(query: {
-                    perPage: 512,
+                    perPage: 150,
                   }) {
                     nodes {
                       gamerTag
@@ -120,35 +93,26 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     numEntrants
                     state
                     startAt
-                    entryFee
                     prizingInfo
                     rulesMarkdown
-                    entrants(query: { perPage: 100 }) {
+                    entrants(query: { perPage: 150 }) {
                       nodes {
                         id
                         name
                         standing {
                          placement
-                        }
-                        participants {
+                         player {
                           id
-                          user {
-                            id
-                          }
+                            user {
+                              id
+                            }
+                         }
                         }
                       }
                     }
                     images {
-                      id
                       url
                       type
-                    }
-                    userEntrant {
-                      id
-                      name
-                      standing {
-                        placement
-                      }
                     }
                   }
                 }
@@ -211,14 +175,12 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       (rankedEventNode) =>
         rankedEventNode?.tournament?.events?.flatMap((eventNode) =>
           eventNode?.entrants?.nodes
-            ?.flatMap((entrantNode) =>
-              entrantNode?.participants?.flatMap((participantNode) => ({
-                rankedEventId: rankedEventNode.id,
-                eventId: eventNode?.id,
-                isPodium: Boolean((entrantNode?.standing?.placement ?? 4) < 4),
-                userId: participantNode?.user?.id,
-              })),
-            )
+            ?.flatMap((entrantNode) => ({
+              rankedEventId: rankedEventNode.id,
+              eventId: eventNode?.id,
+              isPodium: Boolean((entrantNode?.standing?.placement ?? 4) < 4),
+              userId: entrantNode?.standing?.player?.user?.id,
+            }))
             ?.filter((i) => allRankedLeagueEvents?.includes(i?.eventId))
             ?.filter((i) => i?.isPodium),
         ),
@@ -228,16 +190,12 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       (rankedEventNode) =>
         rankedEventNode?.tournament?.events?.flatMap((eventNode) =>
           eventNode?.entrants?.nodes
-            ?.flatMap((entrantNode) =>
-              entrantNode?.participants?.flatMap((participantNode) => ({
-                rankedEventId: rankedEventNode.id,
-                eventId: eventNode?.id,
-                isVictory: Boolean(
-                  (entrantNode?.standing?.placement ?? 0) === 1,
-                ),
-                userId: participantNode?.user?.id,
-              })),
-            )
+            ?.flatMap((entrantNode) => ({
+              rankedEventId: rankedEventNode.id,
+              eventId: eventNode?.id,
+              isVictory: Boolean((entrantNode?.standing?.placement ?? 0) === 1),
+              userId: entrantNode?.standing?.player?.user?.id,
+            }))
             ?.filter((i) => allRankedLeagueEvents?.includes(i?.eventId))
             ?.filter((i) => i?.isVictory),
         ),

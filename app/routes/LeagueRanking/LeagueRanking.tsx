@@ -76,7 +76,7 @@ export default function LeagueRanking() {
                   #{standing?.placement}
                   {currentUser?.id === standing?.player?.user?.id && (
                     <Pill className="bg-violet-600 dark:bg-violet-300">
-                      Você
+                      <span className="text-neutral-200">Você</span>
                     </Pill>
                   )}
                 </Table.Td>
