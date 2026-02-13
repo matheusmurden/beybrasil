@@ -9,7 +9,7 @@ export const isUserInTournament = ({
 }) => {
   return (
     !!userId &&
-    tournament?.allParticipants?.nodes?.map((i) => i?.user?.id).includes(userId)
+    tournament?.participants?.nodes?.map((i) => i?.user?.id).includes(userId)
   );
 };
 

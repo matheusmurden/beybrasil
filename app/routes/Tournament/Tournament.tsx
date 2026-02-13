@@ -60,33 +60,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
             state
             isRegistrationOpen
             eventRegistrationClosesAt
-            unpaidParticipants: participants(query: {
-              perPage: 512,
-              filter: {
-                unpaid: true
-              }
-            }) {
-              nodes {
-                gamerTag
-                user {
-                  id
-                }
-              }
-            }
-            paidParticipants: participants(query: {
-              perPage: 512,
-              filter: {
-                unpaid: false
-              }
-            }) {
-              nodes {
-                gamerTag
-                user {
-                  id
-                }
-              }
-            }
-            allParticipants: participants(query: {
+            participants(query: {
               perPage: 512,
             }) {
               nodes {

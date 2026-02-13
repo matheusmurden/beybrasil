@@ -136,12 +136,6 @@ export interface TournamentObj {
   participants: {
     nodes: Participant[];
   };
-  unpaidParticipants: {
-    nodes: Participant[];
-  };
-  paidParticipants: {
-    nodes: Participant[];
-  };
   allParticipants: {
     nodes: Participant[];
   };

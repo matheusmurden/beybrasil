@@ -33,7 +33,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     ?.flatMap((i) => i[1] as { league: string })[0]?.league;
 
   try {
-    const response = await fetch("https://api.start.gg/gql/alpha", {
+    const standingsResponse = await fetch("https://api.start.gg/gql/alpha", {
       method: "POST",
       body: JSON.stringify({
         query: `{
@@ -60,6 +60,20 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                 }
               }
             }
+          }
+        }`,
+      }),
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const eventsResponse = await fetch("https://api.start.gg/gql/alpha", {
+      method: "POST",
+      body: JSON.stringify({
+        query: `{
+          league(slug: "${leagueSlug}") {
+            name
             events(query: { perPage: 20 }) {
               nodes {
                 id
@@ -106,9 +120,19 @@ export async function loader({ request, params }: Route.LoaderArgs) {
         Authorization: `Bearer ${token}`,
       },
     });
-    const data = await response.json();
+    const standingsData = await standingsResponse.json();
+    const eventsData = await eventsResponse.json();
 
-    const league: LeagueObj = data?.data?.league;
+    const rankingData = {
+      data: {
+        league: {
+          ...standingsData?.data?.league,
+          ...eventsData?.data?.league,
+        },
+      },
+    };
+
+    const league: LeagueObj = rankingData?.data?.league;
 
     const ranking = league?.standings?.nodes;
 
