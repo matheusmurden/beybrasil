@@ -6,9 +6,8 @@ import { redirect } from "react-router";
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
   const token = session.get("startgg:token");
-  const user = session.get("startgg:userinfo");
   const path = new URL(request.url)?.pathname;
-  if ((!token || !user) && path) {
+  if (!token && path) {
     session.set("app:redirect", path);
     return redirect("/login", {
       headers: {

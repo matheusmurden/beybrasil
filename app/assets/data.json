@@ -289,7 +289,15 @@
   },
   {
     "acronym": "OPRB",
-    "name": "Organização Paranaense de Beyblade",
+    "name": "Organização Paranaense de Beyblade (Singles)",
+    "cities": ["Curitiba"],
+    "states": ["PR"],
+    "region": "Sul",
+    "instagram": "@opr.beyblade"
+  },
+  {
+    "acronym": "OPRB-TEAMS",
+    "name": "Organização Paranaense de Beyblade (Teams)",
     "cities": ["Curitiba"],
     "states": ["PR"],
     "region": "Sul",
