@@ -4,14 +4,16 @@ import {
   type LeagueLoaderReturnType,
   type LeagueObj,
 } from "~/types";
-import { Avatar, Card, Modal, Pill, Table } from "@mantine/core";
-import { redirect, useNavigate } from "react-router";
+import { Avatar, Card, Pill, Table } from "@mantine/core";
+import { redirect } from "react-router";
 import classes from "./LeagueRanking.module.css";
 import { useColorScheme } from "@mantine/hooks";
 import classNames from "classnames";
 import { useOutletContext } from "react-router";
 import { getSession } from "~/sessions.server";
 import type { Route } from "./+types/LeagueRanking";
+import { useNavContext } from "~/contexts";
+import { useEffect } from "react";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
@@ -217,10 +219,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 }
 
 export default function LeagueRanking({ loaderData }: Route.ComponentProps) {
-  const navigate = useNavigate();
   const colorScheme = useColorScheme();
 
   const { currentUser } = useOutletContext<LeagueLoaderReturnType>();
+  const { setNavTitle } = useNavContext();
 
   const {
     league,
@@ -230,37 +232,32 @@ export default function LeagueRanking({ loaderData }: Route.ComponentProps) {
     numberOfRankedVictoriesByUser,
   } = loaderData!;
 
+  useEffect(() => {
+    if (league?.name) {
+      setNavTitle(`${league?.name} - Ranking Geral`);
+    }
+    return () => {
+      setNavTitle("");
+    };
+  }, [league, setNavTitle]);
+
   if (!ranking?.length) {
     return (
-      <Modal
-        className={classes.Modal}
-        title={
-          <h2 className="text-lg font-bold">[Ranking] - {league?.name}</h2>
-        }
-        opened
-        onClose={() => navigate(location.pathname.split("/ranking")[0])}
-      >
+      <div className="py-24 pt-32">
         <div className="p-4 pt-0">
           <h3>Ranking Vazio</h3>
           <p>Tente novamente após um torneio ser concluído</p>
         </div>
-      </Modal>
+      </div>
     );
   }
   return (
     !!ranking && (
-      <Modal
-        className={classes.Modal}
-        title={
-          <h2 className="text-lg font-bold">[Ranking] - {league?.name}</h2>
-        }
-        opened
-        onClose={() => navigate(location.pathname.split("/ranking")[0])}
-      >
+      <div className="py-24 pt-32">
         <Table
           className="hidden lg:table"
           stickyHeader
-          stickyHeaderOffset={60}
+          stickyHeaderOffset={80}
           highlightOnHover
           highlightOnHoverColor={colorScheme === "dark" ? "dark" : undefined}
         >
@@ -456,7 +453,7 @@ export default function LeagueRanking({ loaderData }: Route.ComponentProps) {
             </Card>
           ))}
         </Card>
-      </Modal>
+      </div>
     )
   );
 }

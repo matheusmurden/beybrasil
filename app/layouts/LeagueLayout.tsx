@@ -10,6 +10,8 @@ import {
   type TournamentObj,
 } from "~/types";
 import type { Route } from "./+types/LeagueLayout";
+import { TZDate } from "@date-fns/tz";
+import { isBefore } from "date-fns";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
@@ -152,9 +154,19 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     const pastTournaments = allLeagueTournaments?.filter((i) =>
       [TournamentStateEnum?.COMPLETED].includes(i.state),
     );
-    const currentTournaments = allLeagueTournaments?.filter((i) =>
-      [TournamentStateEnum?.ACTIVE].includes(i.state),
-    );
+    const currentTournaments = allLeagueTournaments?.filter((i) => {
+      const endDate = new TZDate(
+        i?.eventRegistrationClosesAt * 1000,
+        "America/Sao_Paulo",
+      );
+      const now = new TZDate(new Date(), "America/Sao_Paulo");
+
+      return (
+        [TournamentStateEnum?.ACTIVE, TournamentStateEnum?.CREATED].includes(
+          i.state,
+        ) && isBefore(endDate, now)
+      );
+    });
 
     const tournamentsParticipants = league?.events?.nodes?.flatMap(
       (tournamentNode) =>

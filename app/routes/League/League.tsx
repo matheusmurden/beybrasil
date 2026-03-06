@@ -3,7 +3,6 @@ import { TopRankedLeaguePlayers, TournamentList } from "~/components";
 import { type LeagueLoaderReturnType } from "~/types";
 import { useEffect } from "react";
 import { useNavContext } from "~/contexts";
-import { Outlet } from "react-router";
 
 export default function League() {
   const {
@@ -13,7 +12,6 @@ export default function League() {
     pastTournaments,
     allRankedLeagueEvents,
     ranking,
-    ...rest
   } = useOutletContext<LeagueLoaderReturnType>();
 
   const { setNavTitle } = useNavContext();
@@ -50,17 +48,6 @@ export default function League() {
           rankedEventIds={allRankedLeagueEvents}
         />
       </div>
-      <Outlet
-        context={{
-          league,
-          currentTournaments,
-          upcomingTournaments,
-          pastTournaments,
-          allRankedLeagueEvents,
-          ranking,
-          ...rest,
-        }}
-      />
     </div>
   );
 }

@@ -183,51 +183,7 @@ export const TournamentList = ({
               </Card.Section>
 
               {/*Call to Action Section*/}
-              {i?.state === TournamentStateEnum.CREATED &&
-                (i?.isRegistrationOpen ? (
-                  <Card.Section withBorder className="p-4">
-                    <Button
-                      size="lg"
-                      w="100%"
-                      variant={
-                        isUserInTournament({
-                          userId: user?.id ?? 0,
-                          tournament: i,
-                        })
-                          ? "outline"
-                          : "filled"
-                      }
-                      color="violet"
-                      onClick={() => navigate(`./${i?.slug}`)}
-                    >
-                      {isUserInTournament({
-                        userId: user?.id ?? 0,
-                        tournament: i,
-                      })
-                        ? "Modificar Inscrição"
-                        : "Fazer Inscrição"}
-                    </Button>
-                  </Card.Section>
-                ) : (
-                  <Card.Section withBorder className="p-4">
-                    <Button
-                      component="a"
-                      target="_blank"
-                      rel="no-referrer"
-                      href={`https://www.start.gg/${i?.slug}/details`}
-                      variant="outline"
-                      size="lg"
-                      w="100%"
-                    >
-                      Ver Detalhes
-                    </Button>
-                  </Card.Section>
-                ))}
-
-              {[
-                TournamentStateEnum.COMPLETED,
-                TournamentStateEnum.ACTIVE,
-              ].includes(i?.state) && (
+              {isActive ? (
                 <Card.Section withBorder className="p-4">
                   <Button
                     onClick={() => navigate(`./${i?.slug}`)}
@@ -236,9 +192,58 @@ export const TournamentList = ({
                     size="lg"
                     w="100%"
                   >
-                    {i?.state === TournamentStateEnum.COMPLETED
-                      ? "Ver Resultados"
-                      : "Acompanhar Ao Vivo"}
+                    Acompanhar Ao Vivo
+                  </Button>
+                </Card.Section>
+              ) : i?.state === TournamentStateEnum.CREATED &&
+                i?.isRegistrationOpen ? (
+                <Card.Section withBorder className="p-4">
+                  <Button
+                    size="lg"
+                    w="100%"
+                    variant={
+                      isUserInTournament({
+                        userId: user?.id ?? 0,
+                        tournament: i,
+                      })
+                        ? "outline"
+                        : "filled"
+                    }
+                    color={
+                      isUserInTournament({
+                        userId: user?.id ?? 0,
+                        tournament: i,
+                      })
+                        ? "green"
+                        : "violet"
+                    }
+                    onClick={() =>
+                      isUserInTournament({
+                        userId: user?.id ?? 0,
+                        tournament: i,
+                      })
+                        ? null
+                        : navigate(`./${i?.slug}`)
+                    }
+                  >
+                    {isUserInTournament({
+                      userId: user?.id ?? 0,
+                      tournament: i,
+                    })
+                      ? "Você Está Inscrito"
+                      : "Fazer Inscrição"}
+                  </Button>
+                </Card.Section>
+              ) : (
+                <Card.Section withBorder className="p-4">
+                  <Button
+                    size="lg"
+                    w="100%"
+                    variant="outline"
+                    color="violet"
+                    onClick={() => navigate(`./${i?.slug}`)}
+                  >
+                    Ver Resultados
                   </Button>
                 </Card.Section>
               )}

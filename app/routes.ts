@@ -11,15 +11,17 @@ export default [
   layout("./layouts/AuthGuardLayout.tsx", [
     // LEAGUE
     layout("./layouts/LeagueLayout.tsx", [
-      route("league/:acronym", "./routes/League/League.tsx", [
-        // LEAGUE RANKING
-        route("ranking", "./routes/LeagueRanking/LeagueRanking.tsx"),
-        // TOURNAMENT DETAILS
-        route(
-          "tournament/:tournamentSlug",
-          "./routes/Tournament/Tournament.tsx",
-        ),
-      ]),
+      route("league/:acronym", "./routes/League/League.tsx"),
+      // LEAGUE RANKING
+      route(
+        "league/:acronym/ranking",
+        "./routes/LeagueRanking/LeagueRanking.tsx",
+      ),
+      // TOURNAMENT DETAILS
+      route(
+        "league/:acronym/tournament/:tournamentSlug",
+        "./routes/Tournament/Tournament.tsx",
+      ),
       // API
       route("/api/user", "./routes/api/User.tsx"),
     ]),

@@ -21,11 +21,8 @@ import {
   Checkbox,
   CheckboxGroup,
   Input,
-  Modal,
   Pill,
 } from "@mantine/core";
-import { useNavigate } from "react-router";
-import { useLocation } from "react-router";
 import { useOutletContext } from "react-router";
 import classNames from "classnames";
 import classes from "./Tournament.module.css";
@@ -276,8 +273,6 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
 
   const actionData = useActionData<{ status: 200 | 400 }>();
 
-  const navigate = useNavigate();
-  const location = useLocation();
   const { league, allRankedLeagueEvents, ranking, currentUser } =
     useOutletContext<{
       league: LeagueObj;
@@ -331,26 +326,14 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
 
   const colorScheme = useColorScheme();
   return (
-    <Modal
-      className={classNames(classes.Modal)}
-      title={
-        <h2 className="text-lg font-bold">[Resultados] - {tournament?.name}</h2>
-      }
-      opened
-      onClose={() => navigate(location.pathname.split("/tournament")[0])}
-    >
-      <Modal.Body className="p-0">
+    <div className="py-24 pt-32">
+      <div className="p-0">
         {tournament &&
         [TournamentStateEnum.COMPLETED, TournamentStateEnum.ACTIVE].includes(
           tournament.state,
         ) ? (
           <div className="flex flex-col gap-8">
-            <Accordion
-              className="p-0"
-              defaultValue={String(
-                tournament?.events.sort(sortByRanked)[0]?.id,
-              )}
-            >
+            <Accordion className="p-0">
               {tournament?.events?.sort(sortByRanked)?.map((event) => (
                 <Accordion.Item key={event.id} value={String(event.id)}>
                   <Accordion.Control className="hover:bg-gray-200 dark:hover:bg-neutral-500 dark:bg-neutral-600">
@@ -361,7 +344,7 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
                       <Table
                         className="hidden lg:table"
                         stickyHeader
-                        stickyHeaderOffset={60}
+                        stickyHeaderOffset={80}
                         highlightOnHover
                         highlightOnHoverColor={
                           colorScheme === "dark" ? "dark" : undefined
@@ -725,7 +708,7 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
             </Form>
           </>
         )}
-      </Modal.Body>
-    </Modal>
+      </div>
+    </div>
   );
 }
