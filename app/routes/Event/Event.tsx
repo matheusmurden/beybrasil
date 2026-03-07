@@ -38,6 +38,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                   winnerId
                   state
                   fullRoundText
+                  displayScore
                   slots {
                     id
                     entrant {

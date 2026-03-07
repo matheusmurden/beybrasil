@@ -3,7 +3,7 @@ export interface User {
   name: string;
   genderPronoun?: string;
   images: {
-    id: string;
+    id: number;
     type: string;
     url: string;
   }[];
@@ -63,7 +63,7 @@ export interface SetGame {
 }
 
 export interface EventSetPlayerSlot {
-  id: string;
+  id: number;
   entrant: Entrant;
 }
 
@@ -73,6 +73,7 @@ export interface EventSet {
   winnerId?: number;
   state: SetStateEnum;
   fullRoundText: string;
+  displayScore: string;
   games: SetGame[];
   slots: EventSetPlayerSlot[];
 }
@@ -173,7 +174,7 @@ export interface TournamentObj {
     };
   }[];
   images?: {
-    id: string;
+    id: number;
     type: "banner" | "profile";
     url: string;
   }[];
