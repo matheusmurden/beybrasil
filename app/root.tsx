@@ -222,6 +222,18 @@ export default function Layout() {
   const isLoginRoute = ["/login", "/logout"].includes(location.pathname);
   const isIndexRoute = location.pathname === "/";
   const [opened, { toggle }] = useDisclosure();
+  const handleGoBack = () => {
+    const { pathname } = location;
+    if (pathname?.includes("/event")) {
+      navigate(pathname?.split("/event")[0]);
+    } else if (pathname?.includes("/tournament")) {
+      navigate(pathname?.split("/tournament")[0]);
+    } else if (pathname?.includes("/ranking")) {
+      navigate(pathname?.split("/ranking")[0]);
+    } else if (pathname?.includes("/league")) {
+      navigate("/");
+    }
+  };
   return (
     <html lang="pt-br">
       <head>
@@ -256,7 +268,7 @@ export default function Layout() {
                               variant="subtle"
                               size={42}
                               visibleFrom="sm"
-                              onClick={() => navigate(-1)}
+                              onClick={() => handleGoBack()}
                             >
                               &larr;
                             </ActionIcon>

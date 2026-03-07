@@ -55,6 +55,37 @@ export enum ActivityStateEnum {
   COMPLETED = "COMPLETED",
 }
 
+export interface SetGame {
+  id: number;
+  entrant1Score?: number | null;
+  entrant2Score?: number | null;
+  winnerId?: number;
+}
+
+export interface EventSetPlayerSlot {
+  id: string;
+  entrant: Entrant;
+}
+
+export interface EventSet {
+  id: number;
+  identifier: string;
+  winnerId?: number;
+  state: SetStateEnum;
+  fullRoundText: string;
+  games: SetGame[];
+  slots: EventSetPlayerSlot[];
+}
+
+export interface EventPhase {
+  id: number;
+  name: string;
+  phaseOrder: number;
+  sets: {
+    nodes: EventSet[];
+  };
+}
+
 export interface LeagueObj {
   name: string;
   city?: string | null;
@@ -96,9 +127,16 @@ export interface EventObj {
     };
   };
   tournament: TournamentObj;
+  phases: EventPhase[];
 }
 
 export enum TournamentStateEnum {
+  CREATED = 1,
+  ACTIVE = 2,
+  COMPLETED = 3,
+}
+
+export enum SetStateEnum {
   CREATED = 1,
   ACTIVE = 2,
   COMPLETED = 3,
@@ -128,6 +166,12 @@ export interface TournamentObj {
   eventRegistrationClosesAt: number;
   events: EventObj[];
   state: TournamentStateEnum;
+  admins?: {
+    player?: {
+      gamerTag?: string;
+      user?: User;
+    };
+  }[];
   images?: {
     id: string;
     type: "banner" | "profile";

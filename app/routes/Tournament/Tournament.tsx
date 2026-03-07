@@ -6,31 +6,17 @@ import { useNavContext } from "~/contexts";
 import { useEffect } from "react";
 import {
   TournamentStateEnum,
-  type EventObj,
   type LeagueObj,
-  type Standing,
   type TournamentObj,
   type User,
 } from "~/types";
 import { Form } from "react-router";
-import {
-  Accordion,
-  Avatar,
-  Button,
-  Card,
-  Checkbox,
-  CheckboxGroup,
-  Input,
-  Pill,
-} from "@mantine/core";
+import { Button, Checkbox, CheckboxGroup, Input } from "@mantine/core";
 import { useOutletContext } from "react-router";
 import classNames from "classnames";
 import classes from "./Tournament.module.css";
 import { isUserInEvent } from "~/helpers";
-import { Table } from "@mantine/core";
-
-import { useColorScheme } from "@mantine/hooks";
-import { RANKING_POINTS_BY_PLACEMENT } from "~/consts";
+import { EventList } from "~/components";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
@@ -43,9 +29,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   ) {
     return redirect("/404");
   }
-
   try {
-    const response = await fetch("https://api.start.gg/gql/alpha", {
+    const tournamentResponse = await fetch("https://api.start.gg/gql/alpha", {
       method: "POST",
       body: JSON.stringify({
         query: `{
@@ -57,6 +42,20 @@ export async function loader({ request, params }: Route.LoaderArgs) {
             state
             isRegistrationOpen
             eventRegistrationClosesAt
+            events(limit: 20) {
+              id
+              slug
+              name
+              numEntrants
+            }
+            admins {
+              player {
+                gamerTag
+                user {
+                  id
+                }
+              }
+            }
             participants(query: {
               perPage: 512,
             }) {
@@ -67,9 +66,31 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                 }
               }
             }
+          }
+        }`,
+      }),
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const eventsResponse = await fetch("https://api.start.gg/gql/alpha", {
+      method: "POST",
+      body: JSON.stringify({
+        query: `{
+          tournament(slug: "${params?.tournamentSlug}") {
             events(limit: 20) {
               id
-              standings(query: { perPage: 20 }) {
+              slug
+              name
+              numEntrants
+              state
+              startAt
+              entryFee
+              prizingInfo
+              rulesMarkdown
+              standings(query: { perPage: 100 }) {
                 nodes {
                   placement
                   totalPoints
@@ -93,57 +114,18 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                       }
                     }
                   }
-                  stats {
-                    score {
-                      value
-                      label
-                      displayValue
-                    }
-                  }
                   player {
                     id
                     gamerTag
                     prefix
                     user {
                       id
-                      images {
+                      images(type: "profile") {
                         url
                         type
                       }
                     }
                   }
-                }
-              }
-              slug
-              name
-              numEntrants
-              state
-              startAt
-              entryFee
-              prizingInfo
-              rulesMarkdown
-              entrants(query: { perPage: 100 }) {
-                nodes {
-                  id
-                  name
-                  participants {
-                    id
-                    user {
-                      id
-                    }
-                  }
-                }
-              }
-              images(type: "profile") {
-                id
-                url
-                type
-              }
-              userEntrant {
-                id
-                name
-                standing {
-                  placement
                 }
               }
             }
@@ -160,10 +142,19 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       data: {
         tournament: TournamentObj;
       };
-    } = await response.json();
+    } = await tournamentResponse.json();
+
+    const eventsData: {
+      data: {
+        tournament: TournamentObj;
+      };
+    } = await eventsResponse.json();
 
     return {
-      tournament: tournamentData?.data?.tournament,
+      tournament: {
+        ...tournamentData?.data?.tournament,
+        ...eventsData?.data?.tournament,
+      },
     };
   } catch (e) {
     console.log(e);
@@ -273,13 +264,11 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
 
   const actionData = useActionData<{ status: 200 | 400 }>();
 
-  const { league, allRankedLeagueEvents, ranking, currentUser } =
-    useOutletContext<{
-      league: LeagueObj;
-      allRankedLeagueEvents: number[];
-      ranking: Standing[];
-      currentUser: User | null;
-    }>();
+  const { league, allRankedLeagueEvents, currentUser } = useOutletContext<{
+    league: LeagueObj;
+    allRankedLeagueEvents: number[];
+    currentUser: User | null;
+  }>();
 
   const tournament = loaderData?.tournament;
 
@@ -307,24 +296,6 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
     ]),
   ).map((i) => String(i));
 
-  const sortByRanked = (a: EventObj, b: EventObj) => {
-    const indexA = allRankedLeagueEvents.indexOf(a.id);
-    const indexB = allRankedLeagueEvents.indexOf(b.id);
-
-    if (indexA === -1 && indexB === -1) {
-      return 0; // Keep original order for items not in idOrder
-    }
-    if (indexA === -1) {
-      return 1; // Items not in idOrder go to the end
-    }
-    if (indexB === -1) {
-      return -1; // Items in idOrder come before those not in it
-    }
-
-    return indexA - indexB; // Both in idOrder, sort by their index
-  };
-
-  const colorScheme = useColorScheme();
   return (
     <div className="py-24 pt-32">
       <div className="p-0">
@@ -332,324 +303,10 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
         [TournamentStateEnum.COMPLETED, TournamentStateEnum.ACTIVE].includes(
           tournament.state,
         ) ? (
-          <div className="flex flex-col gap-8">
-            <Accordion className="p-0">
-              {tournament?.events?.sort(sortByRanked)?.map((event) => (
-                <Accordion.Item key={event.id} value={String(event.id)}>
-                  <Accordion.Control className="hover:bg-gray-200 dark:hover:bg-neutral-500 dark:bg-neutral-600">
-                    <h3 className="dark:text-neutral-300">{event.name}</h3>
-                  </Accordion.Control>
-                  {event?.standings?.nodes?.length > 0 ? (
-                    <Accordion.Panel>
-                      <Table
-                        className="hidden lg:table"
-                        stickyHeader
-                        stickyHeaderOffset={80}
-                        highlightOnHover
-                        highlightOnHoverColor={
-                          colorScheme === "dark" ? "dark" : undefined
-                        }
-                      >
-                        <Table.Thead>
-                          <Table.Tr>
-                            <Table.Th className="text-center">Posição</Table.Th>
-                            <Table.Th>Blader</Table.Th>
-                            <Table.Th className="text-center">
-                              Vitórias
-                            </Table.Th>
-                            <Table.Th className="text-center">
-                              Derrotas
-                            </Table.Th>
-                            {allRankedLeagueEvents?.includes(event?.id) && (
-                              <>
-                                <Table.Th className="text-center">
-                                  Ganhou Pontos Ranqueados
-                                </Table.Th>
-                                <Table.Th className="text-center">
-                                  Pontuação Ranqueada Atual
-                                </Table.Th>
-                                <Table.Th className="text-center">
-                                  Posicão Atual no Ranking
-                                </Table.Th>
-                              </>
-                            )}
-                          </Table.Tr>
-                        </Table.Thead>
-                        <Table.Tbody>
-                          {event?.standings?.nodes.map((standing) => (
-                            <Table.Tr key={standing?.id}>
-                              <Table.Td
-                                className={classNames("text-center", {
-                                  "flex flex-col items-center justify-center":
-                                    currentUser?.id ===
-                                      standing?.player?.user?.id ||
-                                    standing?.entrant?.team?.members?.find(
-                                      (member) =>
-                                        member?.player?.user?.id ===
-                                        currentUser?.id,
-                                    ),
-                                })}
-                              >
-                                #{standing?.placement}
-                                {currentUser?.id ===
-                                  standing?.player?.user?.id ||
-                                standing?.entrant?.team?.members?.find(
-                                  (member) =>
-                                    member?.player?.user?.id ===
-                                    currentUser?.id,
-                                ) ? (
-                                  <Pill className="bg-violet-600 dark:bg-violet-300">
-                                    <span className="text-neutral-200">
-                                      Você
-                                    </span>
-                                  </Pill>
-                                ) : (
-                                  <></>
-                                )}
-                              </Table.Td>
-                              <Table.Td className="overflow-hidden text-ellipsis w-fit max-w-full">
-                                <div className="flex gap-2 items-center w-full">
-                                  <Avatar
-                                    className="cursor-pointer"
-                                    name={
-                                      standing?.player?.gamerTag ??
-                                      standing?.entrant?.team?.name
-                                    }
-                                    src={
-                                      standing?.player?.user?.images?.find(
-                                        (image) => image?.type === "profile",
-                                      )?.url ??
-                                      standing?.entrant?.team?.images?.find(
-                                        (image) => image?.type === "profile",
-                                      )?.url ??
-                                      ""
-                                    }
-                                    alt={
-                                      standing?.player?.gamerTag ??
-                                      standing?.entrant?.team?.name
-                                    }
-                                  />
-                                  <p className="inline-block overflow-hidden text-ellipsis whitespace-nowrap">
-                                    {standing?.player?.prefix ? (
-                                      <span className="text-neutral-500 dark:text-neutral-400">
-                                        {standing?.player?.prefix} |{" "}
-                                      </span>
-                                    ) : (
-                                      ""
-                                    )}
-                                    <span>
-                                      {standing?.player?.gamerTag ??
-                                        standing?.entrant?.name}
-                                    </span>
-                                  </p>
-                                </div>
-                              </Table.Td>
-                              <Table.Td className="text-center">
-                                {standing.setRecordWithoutByes?.wins}
-                              </Table.Td>
-                              <Table.Td className="text-center">
-                                {standing.setRecordWithoutByes?.losses}
-                              </Table.Td>
-                              {allRankedLeagueEvents?.includes(event?.id) && (
-                                <>
-                                  <Table.Td className="text-center">
-                                    {RANKING_POINTS_BY_PLACEMENT?.[
-                                      standing?.placement
-                                    ]
-                                      ? `+${
-                                          RANKING_POINTS_BY_PLACEMENT?.[
-                                            standing?.placement
-                                          ]
-                                        }`
-                                      : "+10"}
-                                  </Table.Td>
-                                  <Table.Td className="text-center">
-                                    {
-                                      ranking?.find(
-                                        (i) =>
-                                          i?.player?.user?.id ===
-                                          standing?.player?.user?.id,
-                                      )?.totalPoints
-                                    }
-                                  </Table.Td>
-                                  <Table.Td className="text-center">
-                                    #
-                                    {
-                                      ranking?.find(
-                                        (i) =>
-                                          i?.player?.user?.id ===
-                                          standing?.player?.user?.id,
-                                      )?.placement
-                                    }
-                                  </Table.Td>
-                                </>
-                              )}
-                            </Table.Tr>
-                          ))}
-                        </Table.Tbody>
-                      </Table>
-                      <Card
-                        shadow="lg"
-                        className="block lg:hidden dark:bg-neutral-700"
-                      >
-                        {event?.standings?.nodes?.map((standing) => (
-                          <Card
-                            my={12}
-                            shadow="sm"
-                            withBorder
-                            className={classNames(
-                              "p-2 md:p-6 dark:bg-neutral-800 dark:border-neutral-600",
-                              {
-                                ["border-violet-600 dark:border-violet-300"]:
-                                  currentUser?.id ===
-                                    standing?.player?.user?.id ||
-                                  standing?.entrant?.team?.members?.find(
-                                    (member) =>
-                                      member?.player?.user?.id ===
-                                      currentUser?.id,
-                                  ),
-                              },
-                            )}
-                            key={standing?.id}
-                          >
-                            <div className="flex flex-col gap-6 items-start justify-center">
-                              <div
-                                className={classNames(
-                                  "items-center justify-start w-full",
-                                  classes.CardTitle,
-                                )}
-                              >
-                                <span
-                                  className={classNames(
-                                    "leading-tight block w-full",
-                                    {
-                                      "text-amber-500 text-xl font-bold ":
-                                        standing?.placement === 1,
-                                      "text-gray-400 text-xl font-bold ":
-                                        standing?.placement === 2,
-                                      "text-amber-700 text-xl font-bold ":
-                                        standing?.placement === 3,
-                                      "text-violet-600 dark:text-violet-300 font-bold ":
-                                        currentUser?.id ===
-                                          standing?.player?.user?.id ||
-                                        standing?.entrant?.team?.members?.find(
-                                          (member) =>
-                                            member?.player?.user?.id ===
-                                            currentUser?.id,
-                                        ),
-                                      "text-neutral-400 dark:text-neutral-500 text-sm font-medium":
-                                        standing?.placement > 3,
-                                    },
-                                  )}
-                                >
-                                  #{standing?.placement}
-                                </span>
-                                <div className="flex gap-2 items-center">
-                                  <Avatar
-                                    className="cursor-pointer"
-                                    name={
-                                      standing?.player?.gamerTag ??
-                                      standing?.entrant?.team?.name
-                                    }
-                                    src={
-                                      standing?.player?.user?.images?.find(
-                                        (image) => image?.type === "profile",
-                                      )?.url ??
-                                      standing?.entrant?.team?.images?.find(
-                                        (image) => image?.type === "profile",
-                                      )?.url ??
-                                      ""
-                                    }
-                                    alt={
-                                      standing?.player?.gamerTag ??
-                                      standing?.entrant?.team?.name
-                                    }
-                                  />
-                                  <p className="inline-block overflow-hidden text-ellipsis whitespace-nowrap">
-                                    {standing?.player?.prefix ? (
-                                      <span className="text-neutral-500 dark:text-neutral-400">
-                                        {standing?.player?.prefix} |{" "}
-                                      </span>
-                                    ) : (
-                                      ""
-                                    )}
-                                    <span>
-                                      {standing?.player?.gamerTag ??
-                                        standing?.entrant?.team?.name}
-                                    </span>
-                                  </p>
-                                </div>
-                              </div>
-                              <div
-                                className={classNames(
-                                  "w-full",
-                                  classes.CardInfo,
-                                )}
-                              >
-                                <div className="leading-tight flex flex-col justify-between gap-2">
-                                  <label className="text-[9px] sm:text-xs text-neutral-500 font-mono tracking-tighter">
-                                    Vitórias
-                                  </label>
-                                  <span className="font-medium">
-                                    {standing.setRecordWithoutByes?.wins}
-                                  </span>
-                                </div>
-                                <div className="leading-tight flex flex-col justify-between gap-2">
-                                  <label className="text-[9px] sm:text-xs text-neutral-500 font-mono tracking-tighter">
-                                    Derrotas
-                                  </label>
-                                  <span className="font-medium">
-                                    {standing.setRecordWithoutByes?.losses}
-                                  </span>
-                                </div>
-                                {allRankedLeagueEvents?.includes(event?.id) && (
-                                  <>
-                                    <div className="leading-tight flex flex-col justify-between gap-2">
-                                      <label className="text-[9px] sm:text-xs text-neutral-500 font-mono tracking-tighter">
-                                        Ganhou Pts.
-                                      </label>
-                                      <span className="font-medium">
-                                        {RANKING_POINTS_BY_PLACEMENT?.[
-                                          standing?.placement
-                                        ]
-                                          ? `+${
-                                              RANKING_POINTS_BY_PLACEMENT?.[
-                                                standing?.placement
-                                              ]
-                                            }`
-                                          : "+10"}
-                                      </span>
-                                    </div>
-                                    <div className="leading-tight flex flex-col justify-between gap-2">
-                                      <label className="text-[9px] sm:text-xs text-neutral-500 font-mono tracking-tighter">
-                                        Ranking Atual
-                                      </label>
-                                      <span className="font-medium">
-                                        #
-                                        {
-                                          ranking?.find(
-                                            (i) =>
-                                              i?.player?.user?.id ===
-                                              standing?.player?.user?.id,
-                                          )?.placement
-                                        }
-                                      </span>
-                                    </div>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          </Card>
-                        ))}
-                      </Card>
-                    </Accordion.Panel>
-                  ) : (
-                    <p>Ainda não há resultados para este evento.</p>
-                  )}
-                </Accordion.Item>
-              ))}
-            </Accordion>
-          </div>
+          <EventList
+            tournament={tournament}
+            rankedEvents={allRankedLeagueEvents}
+          />
         ) : (
           <>
             {!actionData?.status ? (
@@ -674,7 +331,7 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
               >
                 {tournament?.events?.map((event) => (
                   <Checkbox
-                    key={event.id}
+                    key={`checkbox-${event.id}`}
                     name={String(event.id)}
                     value={String(event.id)}
                     label={event?.name}

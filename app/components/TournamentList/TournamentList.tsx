@@ -38,7 +38,7 @@ export const TournamentList = ({
                 {
                   "animate-pulse": isActive,
                 },
-                "hover:border-(--accentColor) border-solid border-2 rounded w-full max-w-full overflow-hidden",
+                "border-solid border-2 rounded w-full max-w-full overflow-hidden",
               )}
               key={i?.id}
             >
@@ -243,7 +243,7 @@ export const TournamentList = ({
                     color="violet"
                     onClick={() => navigate(`./${i?.slug}`)}
                   >
-                    Ver Resultados
+                    Ver Resultados / Partidas
                   </Button>
                 </Card.Section>
               )}

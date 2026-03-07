@@ -17,10 +17,15 @@ export default [
         "league/:acronym/ranking",
         "./routes/LeagueRanking/LeagueRanking.tsx",
       ),
-      // TOURNAMENT DETAILS
+      // TOURNAMENT List of Events
       route(
         "league/:acronym/tournament/:tournamentSlug",
         "./routes/Tournament/Tournament.tsx",
+      ),
+      // Event Details
+      route(
+        "league/:acronym/tournament/:tournamentSlug/event/:eventSlug/matches?",
+        "./routes/Event/Event.tsx",
       ),
       // API
       route("/api/user", "./routes/api/User.tsx"),

@@ -7,3 +7,4 @@ export * from "./TournamentList";
 export * from "./LoadingSpinner";
 export * from "./LeagueNavigation";
 export * from "./TopRankedLeaguePlayers";
+export * from "./EventList";

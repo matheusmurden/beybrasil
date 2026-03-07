@@ -155,7 +155,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       [TournamentStateEnum?.COMPLETED].includes(i.state),
     );
     const currentTournaments = allLeagueTournaments?.filter((i) => {
-      const endDate = new TZDate(
+      const startDate = new TZDate(
         i?.eventRegistrationClosesAt * 1000,
         "America/Sao_Paulo",
       );
@@ -164,7 +164,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       return (
         [TournamentStateEnum?.ACTIVE, TournamentStateEnum?.CREATED].includes(
           i.state,
-        ) && isBefore(endDate, now)
+        ) && isBefore(startDate, now)
       );
     });
 
