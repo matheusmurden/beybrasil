@@ -9,9 +9,15 @@ export const EventPhases = ({ event }: { event: EventObj }) => {
       {event?.phases?.map((phase) => {
         const sets = sortEventSetsByIdentifier({ sets: phase.sets.nodes });
         return (
-          <Accordion key={phase.id}>
+          <Accordion
+            defaultValue={String(event?.phases?.[0]?.id)}
+            key={phase.id}
+          >
             <Accordion.Item value={String(phase.id)}>
-              <Accordion.Control value={String(phase.id)}>
+              <Accordion.Control
+                className="dark:text-gray-100 dark:hover:bg-neutral-500"
+                value={String(phase.id)}
+              >
                 {phase.name}
               </Accordion.Control>
               <Accordion.Panel>

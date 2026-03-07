@@ -18,7 +18,7 @@ const PlayerSlot = ({
     <span
       key={`${set.id}-p${player}`}
       className={classNames(
-        "max-w-full inline-flex items-center overflow-hidden text-nowrap",
+        "max-w-full inline-flex items-center justify-center overflow-hidden text-nowrap",
         className,
       )}
     >
@@ -51,7 +51,7 @@ const PlayerSlot = ({
           {playerSlot.entrant?.name}
           {set?.state === SetStateEnum.COMPLETED &&
             set.winnerId === playerSlot?.entrant?.id && (
-              <CheckIcon className="mx-1 w-2 inline" />
+              <CheckIcon className="lg:hidden mx-1 w-2 inline" />
             )}
         </span>
       </span>
@@ -114,26 +114,34 @@ export const EventSetCard = ({
   event: EventObj;
 }) => {
   return (
-    <Card className="p-4" shadow="sm" withBorder key={set.id}>
+    <Card
+      className="p-4 dark:bg-neutral-700"
+      shadow="sm"
+      withBorder
+      key={set.id}
+    >
       <p className="mb-4 inline-flex justify-between">
         <span>
-          <Pill>{set?.fullRoundText}</Pill>
+          <Pill className="dark:bg-gray-400">{set?.fullRoundText}</Pill>
         </span>
 
         <span className="text-xs text-neutral-500 font-normal">
-          <Pill>Partida {set.identifier}</Pill>
+          <Pill className="dark:bg-gray-400">Partida {set.identifier}</Pill>
         </span>
       </p>
-      <p className="max-w-full inline-grid text-ellipsis grid-cols-12 items-center gap-2">
+      <p className="max-w-full inline-grid items-center place-content-center lg:place-content-start text-ellipsis grid-cols-12 gap-2">
         <PlayerSlot
-          className="col-start-1 col-end-6"
+          className="col-start-1 col-end-13 lg:col-start-1 lg:col-end-6"
           event={event}
           set={set}
           player={1}
         />
-        <PlayerScores className="col-start-6 col-end-8" set={set} />
+        <PlayerScores
+          className="col-start-1 col-end-13 lg:col-start-6 lg:col-end-8 text-center"
+          set={set}
+        />
         <PlayerSlot
-          className="col-start-8 col-end-13"
+          className="col-start-1 col-end-13 lg:col-start-8 lg:col-end-13"
           event={event}
           set={set}
           player={2}

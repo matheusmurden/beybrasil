@@ -1,5 +1,5 @@
 import { getSession } from "~/sessions.server";
-import type { EventObj, LeagueObj, Standing, User } from "~/types";
+import type { EventObj, Standing, User } from "~/types";
 import type { Route } from "./+types/Event";
 import { Tabs } from "@mantine/core";
 import { useOutletContext } from "react-router";
@@ -146,13 +146,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 }
 
 export default function Event({ loaderData }: Route.ComponentProps) {
-  const { allRankedLeagueEvents, ranking, currentUser, league } =
-    useOutletContext<{
-      allRankedLeagueEvents: number[];
-      ranking: Standing[];
-      currentUser: User | null;
-      league: LeagueObj;
-    }>();
+  const { allRankedLeagueEvents, ranking, currentUser } = useOutletContext<{
+    allRankedLeagueEvents: number[];
+    ranking: Standing[];
+    currentUser: User | null;
+  }>();
 
   const { pathname } = useLocation();
 

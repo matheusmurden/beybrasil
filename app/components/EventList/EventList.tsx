@@ -17,7 +17,7 @@ export const EventList = ({
 }) => {
   const navigate = useNavigate();
   return (
-    <div className="grid grid-rows-1 grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {tournament?.events?.map((event) => (
         <Card
           className={classNames(
