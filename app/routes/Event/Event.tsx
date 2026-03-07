@@ -1,5 +1,5 @@
 import { getSession } from "~/sessions.server";
-import type { EventObj, Standing, User } from "~/types";
+import type { EventObj, LeagueObj, Standing, User } from "~/types";
 import type { Route } from "./+types/Event";
 import { Tabs } from "@mantine/core";
 import { useOutletContext } from "react-router";
@@ -7,6 +7,8 @@ import { useLocation } from "react-router";
 import { sortEventEntrantsByStanding } from "~/helpers";
 import { EventStandings } from "./EventStandings";
 import { EventPhases } from "./EventPhases";
+import { useEffect } from "react";
+import { useNavContext } from "~/contexts";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
@@ -110,6 +112,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
               }
             }
           }
+          tournament {
+            id
+            name
+          }
         }
         }`,
       }),
@@ -140,13 +146,17 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 }
 
 export default function Event({ loaderData }: Route.ComponentProps) {
-  const { allRankedLeagueEvents, ranking, currentUser } = useOutletContext<{
-    allRankedLeagueEvents: number[];
-    ranking: Standing[];
-    currentUser: User | null;
-  }>();
+  const { allRankedLeagueEvents, ranking, currentUser, league } =
+    useOutletContext<{
+      allRankedLeagueEvents: number[];
+      ranking: Standing[];
+      currentUser: User | null;
+      league: LeagueObj;
+    }>();
 
   const { pathname } = useLocation();
+
+  const { setNavTitle } = useNavContext();
 
   const arr = pathname?.split("/");
 
@@ -155,10 +165,20 @@ export default function Event({ loaderData }: Route.ComponentProps) {
   const isMatches = arr[lastItemIndex] === "matches";
 
   const event = loaderData?.event;
+  const tournament = event?.tournament;
 
   const entrantsSortedByStanding = event?.entrants?.nodes
     ? sortEventEntrantsByStanding({ entrants: event.entrants.nodes })
     : [];
+
+  useEffect(() => {
+    if (tournament?.name) {
+      setNavTitle(tournament?.name);
+    }
+    return () => {
+      setNavTitle("");
+    };
+  }, [tournament?.name, setNavTitle]);
 
   return (
     !!event && (
