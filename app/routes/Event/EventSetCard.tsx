@@ -6,16 +6,21 @@ const PlayerSlot = ({
   event,
   set,
   player,
+  className,
 }: {
   event: EventObj;
   set: EventSet;
   player: 1 | 2;
+  className?: string;
 }) => {
   const playerSlot = set.slots[player - 1];
   return (
     <span
       key={`${set.id}-p${player}`}
-      className="max-w-[40%] inline-flex items-center gap-2 overflow-hidden text-nowrap"
+      className={classNames(
+        "max-w-full inline-flex items-center overflow-hidden text-nowrap",
+        className,
+      )}
     >
       <span
         className={classNames(
@@ -54,10 +59,21 @@ const PlayerSlot = ({
   );
 };
 
-const PlayerScores = ({ set }: { set: EventSet }) => {
+const PlayerScores = ({
+  set,
+  className,
+}: {
+  set: EventSet;
+  className?: string;
+}) => {
   const isDQ = set?.displayScore?.includes("DQ");
   return (
-    <span className="text-neutral-500 font-medium text-sm">
+    <span
+      className={classNames(
+        "text-neutral-500 font-medium text-sm col",
+        className,
+      )}
+    >
       <span
         className={classNames("font-mono", {
           "text-green-600 font-semibold":
@@ -108,10 +124,20 @@ export const EventSetCard = ({
           <Pill>Partida {set.identifier}</Pill>
         </span>
       </p>
-      <p className="max-w-full inline-flex text-ellipsis items-center gap-2">
-        <PlayerSlot event={event} set={set} player={1} />
-        <PlayerScores set={set} />
-        <PlayerSlot event={event} set={set} player={2} />
+      <p className="max-w-full inline-grid text-ellipsis grid-cols-12 items-center gap-2">
+        <PlayerSlot
+          className="col-start-1 col-end-6"
+          event={event}
+          set={set}
+          player={1}
+        />
+        <PlayerScores className="col-start-6 col-end-8" set={set} />
+        <PlayerSlot
+          className="col-start-8 col-end-13"
+          event={event}
+          set={set}
+          player={2}
+        />
       </p>
     </Card>
   );
