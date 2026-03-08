@@ -1,0 +1,5 @@
+.Modal {
+  & > div > section {
+    transform: translateX(-5vw) !important;
+  }
+}

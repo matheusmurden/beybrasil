@@ -33,7 +33,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     ?.flatMap((i) => i[1] as { league: string })[0]?.league;
 
   try {
-    const standingsResponse = await fetch("https://api.start.gg/gql/alpha", {
+    const standingsResponse = fetch("https://api.start.gg/gql/alpha", {
       method: "POST",
       body: JSON.stringify({
         query: `{
@@ -72,7 +72,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       },
     });
 
-    const eventsResponse = await fetch("https://api.start.gg/gql/alpha", {
+    const eventsResponse = fetch("https://api.start.gg/gql/alpha", {
       method: "POST",
       body: JSON.stringify({
         query: `{
@@ -96,7 +96,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     type
                     url
                   }
-                  participants: participants(query: {
+                  participants(query: {
                     perPage: 512,
                   }) {
                     nodes {
@@ -125,14 +125,19 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       },
     });
 
-    const standingsData = await standingsResponse.json();
-    const eventsData = await eventsResponse.json();
+    const [responseA, responseB] = await Promise.all([
+      standingsResponse,
+      eventsResponse,
+    ]);
+
+    const aData = await responseA.json();
+    const bData = await responseB.json();
 
     const leagueData = {
       data: {
         league: {
-          ...standingsData?.data?.league,
-          ...eventsData?.data?.league,
+          ...aData?.data?.league,
+          ...bData?.data?.league,
         },
       },
     };

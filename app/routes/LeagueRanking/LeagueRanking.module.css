@@ -1,18 +1,3 @@
-.Modal {
-  section {
-    min-width: 75vw;
-    > div {
-      padding: 0.6rem;
-    }
-    @media screen and (max-width: 1280px) {
-      min-width: 95vw;
-    }
-  }
-  > div:not([data-fixed="true"]) {
-    left: 0;
-  }
-}
-
 .CardTitle {
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr);

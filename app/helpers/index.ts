@@ -1,4 +1,5 @@
 import type { Entrant, EventObj, EventSet, TournamentObj } from "~/types";
+import groupBy from "lodash.groupby";
 
 export const isUserInTournament = ({
   userId,
@@ -52,4 +53,19 @@ export const sortEventSetsByIdentifier = ({ sets }: { sets: EventSet[] }) => {
 
     return 0;
   });
+};
+
+export const validateGameDataSubmit = ({
+  scores,
+}: {
+  scores: { winnerId: number; score: number }[];
+}) => {
+  if (scores.length < 2) {
+    return false;
+  }
+  const groupedByWinner = groupBy([...scores], "winnerId");
+  const isValid = Object.values(groupedByWinner).some(
+    (i) => i?.reduce((acc, j) => j?.score + acc, 0) >= 4,
+  );
+  return isValid;
 };

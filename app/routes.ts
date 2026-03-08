@@ -24,8 +24,9 @@ export default [
       ),
       // Event Details
       route(
-        "league/:acronym/tournament/:tournamentSlug/event/:eventSlug/matches?",
+        "league/:acronym/tournament/:tournamentSlug/event/:eventSlug/report?",
         "./routes/Event/Event.tsx",
+        [route("report/:setId", "./routes/ReportSet/ReportSet.tsx")],
       ),
       // API
       route("/api/user", "./routes/api/User.tsx"),

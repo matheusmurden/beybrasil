@@ -87,21 +87,14 @@ export const EventList = ({
               </Pill>
             </div>
           </Card.Section>
-          <Card.Section className="p-4 grid grid-cols-2 gap-2">
+          <Card.Section className="p-4 gap-2">
             <Button
+              fullWidth
               onClick={() =>
                 navigate(`./event/${event?.slug?.split("/event/")[1]}`)
               }
             >
-              Ver Resultados
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() =>
-                navigate(`./event/${event?.slug?.split("/event/")[1]}/matches`)
-              }
-            >
-              Ver Partidas
+              Detalhes do Evento
             </Button>
           </Card.Section>
         </Card>

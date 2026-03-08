@@ -9,6 +9,7 @@ import { EventStandings } from "./EventStandings";
 import { EventPhases } from "./EventPhases";
 import { useEffect } from "react";
 import { useNavContext } from "~/contexts";
+import { Outlet } from "react-router";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
@@ -156,11 +157,7 @@ export default function Event({ loaderData }: Route.ComponentProps) {
 
   const { setNavTitle } = useNavContext();
 
-  const arr = pathname?.split("/");
-
-  const lastItemIndex = arr?.length - 1;
-
-  const isMatches = arr[lastItemIndex] === "matches";
+  const isReportView = pathname.includes("/report");
 
   const event = loaderData?.event;
   const tournament = event?.tournament;
@@ -179,39 +176,35 @@ export default function Event({ loaderData }: Route.ComponentProps) {
   }, [tournament?.name, setNavTitle]);
 
   return (
-    !!event && (
-      <div className="py-24 pt-32">
-        <h1>{event?.name}</h1>
-        <Tabs
-          defaultValue={isMatches ? "matches" : "standings"}
-          className="mt-8"
-        >
-          <Tabs.List className="mb-4">
-            <Tabs.Tab value="standings">
-              <p>
-                <strong>Resultados</strong>
-              </p>
-            </Tabs.Tab>
-            <Tabs.Tab value="matches">
-              <p>
-                <strong>Partidas</strong>
-              </p>
-            </Tabs.Tab>
-          </Tabs.List>
-          <Tabs.Panel value="standings">
-            <EventStandings
-              entrants={entrantsSortedByStanding}
-              event={event}
-              rankedEventIds={allRankedLeagueEvents}
-              currentUser={currentUser}
-              ranking={ranking}
-            />
-          </Tabs.Panel>
-          <Tabs.Panel value="matches">
-            <EventPhases event={event} />
-          </Tabs.Panel>
-        </Tabs>
-      </div>
-    )
+    <div className="py-24 pt-32">
+      <h1>{event?.name}</h1>
+      <Tabs defaultValue={"matches"} className="mt-8">
+        <Tabs.List className="mb-4">
+          <Tabs.Tab value="standings">
+            <p>
+              <strong>Resultados</strong>
+            </p>
+          </Tabs.Tab>
+          <Tabs.Tab value="matches">
+            <p>
+              <strong>Partidas</strong>
+            </p>
+          </Tabs.Tab>
+        </Tabs.List>
+        <Tabs.Panel value="standings">
+          <EventStandings
+            entrants={entrantsSortedByStanding}
+            event={event}
+            rankedEventIds={allRankedLeagueEvents}
+            currentUser={currentUser}
+            ranking={ranking}
+          />
+        </Tabs.Panel>
+        <Tabs.Panel value="matches">
+          <EventPhases event={event} isReportView={isReportView} />
+        </Tabs.Panel>
+      </Tabs>
+      <Outlet context={{ entrantsSortedByStanding, event }} />
+    </div>
   );
 }

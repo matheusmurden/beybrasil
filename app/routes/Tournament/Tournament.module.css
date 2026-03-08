@@ -1,20 +1,5 @@
 @reference "tailwindcss";
 
-.Modal {
-  section {
-    min-width: 75vw;
-    > div {
-      padding: 0;
-    }
-    @media screen and (max-width: 1280px) {
-      min-width: 95vw;
-    }
-  }
-  > div:not([data-fixed="true"]) {
-    left: 0;
-  }
-}
-
 .Checkbox {
   input,
   label {

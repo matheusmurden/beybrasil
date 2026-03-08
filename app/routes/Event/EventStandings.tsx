@@ -13,7 +13,7 @@ export const EventStandings = ({
   ranking,
 }: {
   entrants: Entrant[];
-  event: EventObj;
+  event?: EventObj;
   rankedEventIds: number[];
   currentUser: User | null;
   ranking: Standing[];
@@ -54,7 +54,7 @@ export const EventStandings = ({
             <Table.Tbody>
               {entrants.map((entrant) => (
                 <Table.Tr
-                  key={`table-row-${event.id}-${entrant?.standing?.id}`}
+                  key={`table-row-${event?.id}-${entrant?.standing?.id}`}
                 >
                   <Table.Td
                     className={classNames("text-center", {
@@ -106,7 +106,7 @@ export const EventStandings = ({
                   <Table.Td className="text-center">
                     {entrant?.standing?.setRecordWithoutByes?.losses}
                   </Table.Td>
-                  {rankedEventIds?.includes(event?.id) &&
+                  {rankedEventIds?.includes(event?.id ?? 0) &&
                     !!entrant?.standing?.placement && (
                       <>
                         <Table.Td className="text-center">

@@ -17,6 +17,8 @@ import classNames from "classnames";
 import classes from "./Tournament.module.css";
 import { isUserInEvent } from "~/helpers";
 import { EventList } from "~/components";
+import { isBefore } from "date-fns";
+import { TZDate } from "@date-fns/tz";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
@@ -296,13 +298,17 @@ export default function Tournament({ loaderData }: Route.ComponentProps) {
     ]),
   ).map((i) => String(i));
 
+  const now = new TZDate(new Date(), "America/Sao_Paulo");
+
+  const startsAt = new TZDate(
+    (tournament?.eventRegistrationClosesAt ?? 0) * 1000,
+    "America/Sao_Paulo",
+  );
+
   return (
     <div className="py-24 pt-32">
       <div className="p-0">
-        {tournament &&
-        [TournamentStateEnum.COMPLETED, TournamentStateEnum.ACTIVE].includes(
-          tournament.state,
-        ) ? (
+        {tournament && isBefore(startsAt, now) ? (
           <EventList
             tournament={tournament}
             rankedEvents={allRankedLeagueEvents}
