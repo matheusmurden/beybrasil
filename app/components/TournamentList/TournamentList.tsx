@@ -28,7 +28,7 @@ export const TournamentList = ({
       <div className="w-full">
         <h2 className="mb-2 font-semibold text-xl">{listTitle}</h2>
         <ul className="flex flex-col lg:flex-row gap-6 w-full">
-          {tournaments?.map((i) => (
+          {tournaments?.toReversed()?.map((i) => (
             <Card
               component="li"
               shadow="sm"

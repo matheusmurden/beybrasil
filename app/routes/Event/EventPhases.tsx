@@ -21,7 +21,7 @@ export const EventPhases = ({
       {phases?.map((phase) => {
         const sets = sortEventSetsByIdentifier({
           sets: phase?.sets?.nodes ?? [],
-        });
+        }).toReversed();
         return (
           <Accordion defaultValue={String(phases?.[0]?.id)} key={phase.id}>
             <Accordion.Item value={String(phase.id)}>

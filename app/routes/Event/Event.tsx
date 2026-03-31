@@ -332,12 +332,12 @@ export default function Event({ loaderData }: Route.ComponentProps) {
       <h1>{event?.name}</h1>
       <Tabs defaultValue={"matches"} className="mt-8">
         <Tabs.List className="mb-4">
-          <Tabs.Tab value="standings">
+          <Tabs.Tab value="standings" className="dark:hover:bg-neutral-600">
             <p>
               <strong>Resultados</strong>
             </p>
           </Tabs.Tab>
-          <Tabs.Tab value="matches">
+          <Tabs.Tab value="matches" className="dark:hover:bg-neutral-600">
             <p>
               <strong>Partidas</strong>
             </p>
