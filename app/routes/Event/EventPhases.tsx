@@ -19,7 +19,9 @@ export const EventPhases = ({
   return (
     <section className="grid">
       {phases?.map((phase) => {
-        const sets = sortEventSetsByIdentifier({ sets: phase.sets.nodes });
+        const sets = sortEventSetsByIdentifier({
+          sets: phase?.sets?.nodes ?? [],
+        });
         return (
           <Accordion defaultValue={String(phases?.[0]?.id)} key={phase.id}>
             <Accordion.Item value={String(phase.id)}>
@@ -31,14 +33,17 @@ export const EventPhases = ({
               </Accordion.Control>
               <Accordion.Panel>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {sets.map((set) => (
-                    <EventSetCard
-                      isReportView={isReportView}
-                      key={set.id}
-                      set={set}
-                      event={event}
-                    />
-                  ))}
+                  {sets.map(
+                    (set) =>
+                      !!set?.id && (
+                        <EventSetCard
+                          isReportView={isReportView}
+                          key={set?.id}
+                          set={set}
+                          event={event}
+                        />
+                      ),
+                  )}
                 </div>
               </Accordion.Panel>
             </Accordion.Item>

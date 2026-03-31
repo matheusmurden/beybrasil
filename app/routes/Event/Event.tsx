@@ -1,5 +1,5 @@
 import { getSession } from "~/sessions.server";
-import type { EventObj, EventPhase, Standing, User } from "~/types";
+import type { EventObj, EventPhase, EventSet, Standing, User } from "~/types";
 import type { Route } from "./+types/Event";
 import { Tabs } from "@mantine/core";
 import { useOutletContext } from "react-router";
@@ -105,30 +105,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                 id
                 name
                 phaseOrder
-                sets(perPage: 512, filters: { hideEmpty: true, showByes: false }) {
+                sets(perPage: 10, filters: { hideEmpty: true, showByes: false }) {
                   pageInfo {
                     totalPages
-                  }
-                  nodes {
-                    id
-                    identifier
-                    winnerId
-                    state
-                    fullRoundText
-                    displayScore
-                    slots {
-                      id
-                      entrant {
-                        id
-                        name
-                      }
-                    }
-                    games {
-                      id
-                      entrant1Score
-                      entrant2Score
-                      winnerId
-                    }
                   }
                 }
               }
@@ -148,8 +127,92 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
     // @ts-expect-error refactor later
     const allPhasesData: PromiseFulfilledResult<{
-      data: { event: { phases: EventPhase } };
+      data: { event: { phases: EventPhase[] } };
     }>[] = await Promise.allSettled(promises);
+
+    const allPhases = allPhasesData?.flatMap((i) => ({
+      ...i?.value?.data?.event?.phases[0],
+      sets: {
+        ...i?.value?.data?.event?.phases[0]?.sets,
+        nodes: [] as EventSet[],
+      },
+    }));
+
+    let newPhases = [...allPhases];
+
+    // Wait for all phases to fetch their sets
+    await Promise.all(
+      allPhases?.map(async (phase, phaseIndex) => {
+        const promises = [];
+        const totalPages = phase?.sets?.pageInfo?.totalPages ?? 1;
+
+        // Push promises without awaiting (fetch pages in parallel)
+        for (let i = 1; i <= totalPages; i++) {
+          promises.push(
+            fetch("https://api.start.gg/gql/alpha", {
+              method: "POST",
+              body: JSON.stringify({
+                query: `{
+              event(slug: ${slug}) {
+                phases(phaseId: ${phase.id}) {
+                  id
+                  name
+                  phaseOrder
+                  sets(page: ${i}, perPage: 10, filters: { hideEmpty: true, showByes: false }) {
+                    pageInfo {
+                      totalPages
+                    }
+                    nodes {
+                      id
+                      identifier
+                      winnerId
+                      state
+                      fullRoundText
+                      displayScore
+                      slots {
+                        id
+                        entrant {
+                          id
+                          name
+                        }
+                      }
+                      games {
+                        id
+                        entrant1Score
+                        entrant2Score
+                        winnerId
+                      }
+                    }
+                  }
+                }
+              }
+            }`, // same query as before
+              }),
+              headers: {
+                "Content-type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            }).then(async (res) => await res.json()),
+          );
+        }
+
+        const data = await Promise.allSettled(promises).then((res) => {
+          return res.flatMap((i) =>
+            i.status === "fulfilled"
+              ? i?.value?.data?.event?.phases[0]?.sets?.nodes
+              : "",
+          );
+        });
+
+        newPhases[phaseIndex] = {
+          ...newPhases[phaseIndex],
+          sets: {
+            ...newPhases[phaseIndex].sets,
+            nodes: [...newPhases[phaseIndex].sets.nodes, ...data],
+          },
+        };
+      }),
+    );
 
     const entrantsResponse = await fetch("https://api.start.gg/gql/alpha", {
       method: "POST",
@@ -222,16 +285,12 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       };
     } = await entrantsResponse.json();
 
-    const allPhases = allPhasesData?.flatMap(
-      (i) => i?.value?.data?.event?.phases,
-    );
-
     return {
       event: {
         ...eventData?.data?.event,
         entrants: entrantsData?.data?.event?.entrants,
         tournament: entrantsData?.data?.event?.tournament,
-        phases: allPhases,
+        phases: newPhases, // ← Now contains the fetched sets
       },
     };
   } catch (e) {

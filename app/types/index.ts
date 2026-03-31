@@ -83,6 +83,7 @@ export interface EventPhase {
   name: string;
   phaseOrder: number;
   sets: {
+    pageInfo: PageInfo;
     nodes: EventSet[];
   };
 }
