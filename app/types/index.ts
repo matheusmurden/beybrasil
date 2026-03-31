@@ -93,9 +93,11 @@ export interface LeagueObj {
   endAt: number;
   entrantCount: number;
   events: {
+    pageInfo: PageInfo;
     nodes: EventObj[];
   };
   standings: {
+    pageInfo: PageInfo;
     nodes: Standing[];
   };
 }
@@ -117,9 +119,11 @@ export interface EventObj {
   state: ActivityStateEnum;
   startAt: number;
   entrants?: {
+    pageInfo: PageInfo;
     nodes: Entrant[];
   };
   standings: {
+    pageInfo: PageInfo;
     nodes: Standing[];
   };
   userEntrant?: {
@@ -141,6 +145,14 @@ export enum SetStateEnum {
   CREATED = 1,
   ACTIVE = 2,
   COMPLETED = 3,
+}
+
+export interface PageInfo {
+  total: number;
+  totalPages: number;
+  page: number;
+  perPage: number;
+  sortBy: string;
 }
 
 export interface Participant {
@@ -179,9 +191,11 @@ export interface TournamentObj {
     url: string;
   }[];
   participants: {
+    pageInfo: PageInfo;
     nodes: Participant[];
   };
   allParticipants: {
+    pageInfo: PageInfo;
     nodes: Participant[];
   };
 }

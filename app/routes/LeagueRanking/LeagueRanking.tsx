@@ -1,6 +1,7 @@
 import manualContent from "~/assets/manualContent.json" with { type: "json" };
 import {
   TournamentStateEnum,
+  type EventObj,
   type LeagueLoaderReturnType,
   type LeagueObj,
 } from "~/types";
@@ -70,48 +71,18 @@ export async function loader({ request, params }: Route.LoaderArgs) {
         Authorization: `Bearer ${token}`,
       },
     });
-    const eventsResponse = await fetch("https://api.start.gg/gql/alpha", {
+
+    const eventsPageResponse = await fetch("https://api.start.gg/gql/alpha", {
       method: "POST",
       body: JSON.stringify({
         query: `{
           league(slug: "${leagueSlug}") {
             name
-            events(query: { perPage: 20 }) {
-              nodes {
-                id
-                tournament {
-                  id
-                  state
-                  participants(query: {
-                    perPage: 100,
-                  }) {
-                    nodes {
-                      user {
-                        id
-                      }
-                    }
-                  }
-                  events(limit: 20) {
-                    id
-                    name
-                    state
-                    entrants(query: { perPage: 150 }) {
-                      nodes {
-                        id
-                        name
-                        standing {
-                         placement
-                         player {
-                          id
-                            user {
-                              id
-                            }
-                         }
-                        }
-                      }
-                    }
-                  }
-                }
+            events(query: { perPage: 1 }) {
+              pageInfo {
+                total
+                totalPages
+                page
               }
             }
           }
@@ -122,14 +93,93 @@ export async function loader({ request, params }: Route.LoaderArgs) {
         Authorization: `Bearer ${token}`,
       },
     });
+
+    const eventsPageData: { data: { league: LeagueObj } } =
+      await eventsPageResponse.json();
+
+    const promises = [];
+
+    for (
+      let i = 1;
+      i <= (eventsPageData?.data?.league?.events?.pageInfo?.totalPages ?? 1);
+      i++
+    ) {
+      promises.push(
+        await fetch("https://api.start.gg/gql/alpha", {
+          method: "POST",
+          body: JSON.stringify({
+            query: `{
+            league(slug: "${leagueSlug}") {
+              name
+              events(query: { perPage: 1, page: ${i} }) {
+                nodes {
+                  id
+                  tournament {
+                    id
+                    state
+                    participants(query: {
+                      perPage: 512,
+                    }) {
+                      nodes {
+                        user {
+                          id
+                        }
+                      }
+                    }
+                    events(limit: 20) {
+                      id
+                      name
+                      state
+                      entrants(query: { perPage: 512 }) {
+                        nodes {
+                          id
+                          name
+                          standing {
+                           placement
+                           player {
+                            id
+                              user {
+                                id
+                              }
+                           }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }`,
+          }),
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }).then(async (res) => {
+          const result = await res.json();
+          return result;
+        }),
+      );
+    }
+
+    // @ts-expect-error refactor later
+    const eventsData: PromiseFulfilledResult<{
+      data: { league: { events: { nodes: EventObj } } };
+    }>[] = await Promise.allSettled(promises);
     const standingsData = await standingsResponse.json();
-    const eventsData = await eventsResponse.json();
+
+    const eventNodes = eventsData?.flatMap(
+      (i) => i?.value?.data?.league?.events.nodes,
+    );
 
     const rankingData = {
       data: {
         league: {
           ...standingsData?.data?.league,
-          ...eventsData?.data?.league,
+          events: {
+            nodes: eventNodes ?? [],
+          },
         },
       },
     };

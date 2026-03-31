@@ -42,7 +42,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
             city
             endAt
             entrantCount
-            standings(query: { perPage: 100 }) {
+            standings(query: { perPage: 512 }) {
               nodes {
                 id
                 placement

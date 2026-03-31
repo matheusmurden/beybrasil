@@ -1,5 +1,5 @@
 import { getSession } from "~/sessions.server";
-import type { EventObj, Standing, User } from "~/types";
+import type { EventObj, EventPhase, Standing, User } from "~/types";
 import type { Route } from "./+types/Event";
 import { Tabs } from "@mantine/core";
 import { useOutletContext } from "react-router";
@@ -30,11 +30,28 @@ export async function loader({ request, params }: Route.LoaderArgs) {
             entryFee
             prizingInfo
             rulesMarkdown
+          }
+        }`,
+      }),
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const phasesResponse = await fetch("https://api.start.gg/gql/alpha", {
+      method: "POST",
+      body: JSON.stringify({
+        query: `{
+          event(slug: ${slug}) {
             phases {
               id
               name
               phaseOrder
-              sets(perPage: 100, filters: { hideEmpty: true, showByes: false }) {
+              sets(perPage: 1, filters: { hideEmpty: true, showByes: false }) {
+                pageInfo {
+                  totalPages
+                }
                 nodes {
                   id
                   identifier
@@ -67,12 +84,79 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       },
     });
 
+    const phasesData: {
+      data: {
+        event: {
+          phases: EventPhase[];
+        };
+      };
+    } = await phasesResponse.json();
+
+    const promises = [];
+
+    for (let i = 0; i < phasesData?.data?.event?.phases?.length; i++) {
+      promises.push(
+        await fetch("https://api.start.gg/gql/alpha", {
+          method: "POST",
+          body: JSON.stringify({
+            query: `{
+            event(slug: ${slug}) {
+              phases(phaseId: ${phasesData?.data?.event?.phases[i]?.id}) {
+                id
+                name
+                phaseOrder
+                sets(perPage: 512, filters: { hideEmpty: true, showByes: false }) {
+                  pageInfo {
+                    totalPages
+                  }
+                  nodes {
+                    id
+                    identifier
+                    winnerId
+                    state
+                    fullRoundText
+                    displayScore
+                    slots {
+                      id
+                      entrant {
+                        id
+                        name
+                      }
+                    }
+                    games {
+                      id
+                      entrant1Score
+                      entrant2Score
+                      winnerId
+                    }
+                  }
+                }
+              }
+            }
+          }`,
+          }),
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }).then(async (res) => {
+          const result = await res.json();
+          return result;
+        }),
+      );
+    }
+
+    // @ts-expect-error refactor later
+    const allPhasesData: PromiseFulfilledResult<{
+      data: { event: { phases: EventPhase } };
+    }>[] = await Promise.allSettled(promises);
+
     const entrantsResponse = await fetch("https://api.start.gg/gql/alpha", {
       method: "POST",
       body: JSON.stringify({
         query: `{
         event(slug: ${slug}) {
-          entrants(query: { perPage: 100 }) {
+          entrants(query: { perPage: 512 }) {
             nodes {
               id
               name
@@ -138,8 +222,17 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       };
     } = await entrantsResponse.json();
 
+    const allPhases = allPhasesData?.flatMap(
+      (i) => i?.value?.data?.event?.phases,
+    );
+
     return {
-      event: { ...eventData?.data?.event, ...entrantsData?.data?.event },
+      event: {
+        ...eventData?.data?.event,
+        entrants: entrantsData?.data?.event?.entrants,
+        tournament: entrantsData?.data?.event?.tournament,
+        phases: allPhases,
+      },
     };
   } catch (e) {
     console.log(e);
