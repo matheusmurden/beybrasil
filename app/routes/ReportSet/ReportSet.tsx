@@ -62,6 +62,12 @@ export async function action({ request, params }: Route.ActionArgs) {
   }
 }
 
+export function headers() {
+  return {
+    "Cache-Control": "s-maxage=59, stale-while-revalidate=179",
+  };
+}
+
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
   const token = session.get("startgg:token");

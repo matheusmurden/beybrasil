@@ -11,6 +11,12 @@ import { useEffect } from "react";
 import { useNavContext } from "~/contexts";
 import { Outlet } from "react-router";
 
+export function headers() {
+  return {
+    "Cache-Control": "s-maxage=59, stale-while-revalidate=179",
+  };
+}
+
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
   const token = session.get("startgg:token");
@@ -138,7 +144,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       },
     }));
 
-    let newPhases = [...allPhases];
+    const newPhases = [...allPhases];
 
     // Wait for all phases to fetch their sets
     await Promise.all(

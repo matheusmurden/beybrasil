@@ -4,12 +4,7 @@ import { redirect, useActionData } from "react-router";
 import type { Route } from "./+types/Tournament";
 import { useNavContext } from "~/contexts";
 import { useEffect } from "react";
-import {
-  TournamentStateEnum,
-  type LeagueObj,
-  type TournamentObj,
-  type User,
-} from "~/types";
+import { type LeagueObj, type TournamentObj, type User } from "~/types";
 import { Form } from "react-router";
 import { Button, Checkbox, CheckboxGroup, Input } from "@mantine/core";
 import { useOutletContext } from "react-router";
@@ -19,6 +14,12 @@ import { isUserInEvent } from "~/helpers";
 import { EventList } from "~/components";
 import { isBefore } from "date-fns";
 import { TZDate } from "@date-fns/tz";
+
+export function headers() {
+  return {
+    "Cache-Control": "s-maxage=59, stale-while-revalidate=179",
+  };
+}
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));

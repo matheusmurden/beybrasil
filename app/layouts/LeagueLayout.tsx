@@ -13,6 +13,12 @@ import type { Route } from "./+types/LeagueLayout";
 import { TZDate } from "@date-fns/tz";
 import { isBefore } from "date-fns";
 
+export function headers() {
+  return {
+    "Cache-Control": "s-maxage=59, stale-while-revalidate=179",
+  };
+}
+
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
   const token = session.get("startgg:token");

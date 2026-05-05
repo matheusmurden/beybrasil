@@ -28,9 +28,9 @@ export default [
         "./routes/Event/Event.tsx",
         [route("report/:setId", "./routes/ReportSet/ReportSet.tsx")],
       ),
-      // API
-      route("/api/user", "./routes/api/User.tsx"),
     ]),
+    // API
+    route("/api/user", "./routes/api/User.tsx"),
   ]),
   // AUTH MANAGEMENT
   route("/oauth", "./routes/OAuth/OAuth.tsx"),

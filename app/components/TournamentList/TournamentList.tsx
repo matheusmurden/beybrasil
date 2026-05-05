@@ -2,7 +2,7 @@ import { formatDate } from "date-fns";
 import { TournamentStateEnum, type TournamentObj } from "~/types";
 import classes from "./TournamentList.module.css";
 import classNames from "classnames";
-import { Avatar, Button, Card, Pill, PillGroup } from "@mantine/core";
+import { Button, Card, Pill, PillGroup } from "@mantine/core";
 import { useNavigate } from "react-router";
 import { useUserContext } from "~/contexts";
 import { isUserInTournament } from "~/helpers";
@@ -27,7 +27,7 @@ export const TournamentList = ({
     tournaments?.length > 0 && (
       <div className="w-full">
         <h2 className="mb-2 font-semibold text-xl">{listTitle}</h2>
-        <ul className="flex flex-col lg:flex-row gap-6 w-full">
+        <ul className="flex flex-col lg:flex-row gap-6 w-full flex-wrap">
           {tournaments?.toReversed()?.map((i) => (
             <Card
               component="li"
@@ -38,22 +38,13 @@ export const TournamentList = ({
                 {
                   "animate-pulse": isActive,
                 },
-                "border-solid border-2 rounded w-full max-w-full overflow-hidden",
+                "border-solid border-2 rounded w-80 max-w-full overflow-hidden",
               )}
               key={i?.id}
             >
               {/*Tournament Status Section*/}
               <Card.Section className="pt-5 pb-0 px-3 mb-2">
                 <div className="flex items-center justify-center gap-3">
-                  {!!i?.images?.find((image) => image.type === "profile") && (
-                    <Avatar
-                      size="lg"
-                      src={
-                        i?.images?.find((image) => image.type === "profile")
-                          ?.url
-                      }
-                    />
-                  )}
                   <PillGroup className="flex flex-col flex-1 items-start">
                     {i?.state === TournamentStateEnum.ACTIVE && (
                       <Pill className=" text-white bg-green-500 dark:bg-green-700">
@@ -108,7 +99,7 @@ export const TournamentList = ({
                                 i?.startAt * 1000,
                                 "America/Sao_Paulo",
                               ),
-                              "dd 'de' MMMM 'às' HH:mm",
+                              "dd'/'MM 'às' HH:mm",
                               {
                                 locale: ptBR,
                               },
@@ -118,7 +109,7 @@ export const TournamentList = ({
                                 i?.startAt * 1000,
                                 "America/Sao_Paulo",
                               ),
-                              "dd 'de' MMMM 'às' HH:mm",
+                              "dd'/'MM 'às' HH:mm",
                               {
                                 locale: ptBR,
                               },
@@ -243,7 +234,7 @@ export const TournamentList = ({
                     color="violet"
                     onClick={() => navigate(`./${i?.slug}`)}
                   >
-                    Ver Resultados / Partidas
+                    Ver Resultados
                   </Button>
                 </Card.Section>
               )}
