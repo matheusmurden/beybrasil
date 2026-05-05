@@ -18,7 +18,8 @@ import { useEffect } from "react";
 
 export function headers() {
   return {
-    "Cache-Control": "s-maxage=3600, stale-while-revalidate=7200",
+    "Cache-Control":
+      "s-maxage=3600, stale-while-revalidate=7200, stale-if-error=86400",
   };
 }
 

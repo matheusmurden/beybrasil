@@ -10,10 +10,13 @@ import { EventPhases } from "./EventPhases";
 import { useEffect } from "react";
 import { useNavContext } from "~/contexts";
 import { Outlet } from "react-router";
+import { useFetcher } from "react-router";
+import { useInterval } from "@mantine/hooks";
 
 export function headers() {
   return {
-    "Cache-Control": "s-maxage=59, stale-while-revalidate=179",
+    "Cache-Control":
+      "s-maxage=59, stale-while-revalidate=179, stale-if-error=86400",
   };
 }
 
@@ -311,18 +314,30 @@ export default function Event({ loaderData }: Route.ComponentProps) {
     currentUser: User | null;
   }>();
 
+  const fetcher = useFetcher<typeof loader>();
+
   const { pathname } = useLocation();
+
+  const reload = () => fetcher.load("./");
+
+  const { start } = useInterval(reload, 15000, {
+    autoInvoke: true,
+  });
 
   const { setNavTitle } = useNavContext();
 
   const isReportView = pathname.includes("/report");
 
-  const event = loaderData?.event;
+  const event = loaderData?.event ?? fetcher?.data?.event;
   const tournament = event?.tournament;
 
   const entrantsSortedByStanding = event?.entrants?.nodes
     ? sortEventEntrantsByStanding({ entrants: event.entrants.nodes })
     : [];
+
+  useEffect(() => {
+    start();
+  }, [start]);
 
   useEffect(() => {
     if (tournament?.name) {
